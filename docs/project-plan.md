@@ -1,332 +1,475 @@
-# Poverty Development Platform — Project Plan (v2)
+# Prosperax — Project Plan (v4)
 
-**Status:** Decisions locked for model + design direction · ready for next client workshop  
-**Document version:** 2.0  
+**Status:** Product + ops defaults filled · ready for PRD + wireframes + build  
+**Document version:** 4.0  
 **Last updated:** 2026-08-12  
+**Brand / domain:** [Prosperax.org](https://prosperax.org)
 
 | Item | Decision |
 |---|---|
-| Target market | Nigeria |
+| Brand | **Prosperax** · prosperax.org |
+| Positioning / tagline | Mutual aid · hopeful community |
+| Target market | Nigeria · English only (v1) |
 | Brand color | Green |
-| Payment gateway | Paystack |
-| Product model | **A — Mutual aid / peer donations** ✅ Confirmed |
-| Design reference | [Rising Lion Money](https://risinglionmoney.com/) (editorial story style, adapted for giving) |
-| Stack | FastAPI + PostgreSQL (backend), Next.js (frontend) |
+| Payment gateway | Paystack (merchant: private entity) |
+| Fund holding | **Platform Paystack balance (operational escrow)** until approval / weekly payout |
+| Product model | **A — Mutual aid / peer donations** ✅ |
+| Design reference | [Rising Lion Money](https://risinglionmoney.com/) editorial story style ✅ |
+| Stack | FastAPI + PostgreSQL · Next.js |
 
-**Document purpose:** Capture what is already agreed, refine the Model A product shape, define a Rising-Lion-inspired UX direction, and list the remaining decisions for the next discussion.
-
----
-
-## 1. Confirmed direction
-
-### Product model: A — Mutual aid / peer donations
-- People in need publish **personal help requests** (story + goal + proof).
-- Other people **donate directly to that person/request** via Paystack.
-- Activity “grows” through **more verified requests, more donors, more completed helps, and public impact stories** — not investment yield.
-
-### What we are *not* building in v1
-- Crowdfunding campaign marketplace as the primary model (Model B)
-- Shared community pool / investment-style “money grows”
-- Giving circles with rotating payouts
-- NGO project marketplace as the core experience
-
-Those can be discussed later as expansion options.
+**Document purpose:** Single source of truth for Prosperax v1 — locked client decisions plus suggested defaults for remaining gaps so design and engineering can proceed. Items marked **Suggested default** can be changed by the client without changing the overall architecture.
 
 ---
 
-## 2. Product vision (updated)
+## 1. Confirmed product direction
 
-> A Nigeria-first mutual aid platform where real people share verified needs, others send help through Paystack, and every successful gift becomes a visible story of progress.
+Prosperax is a Nigeria-first **mutual aid** platform:
+- People publish personal **help requests** (full name + photo + story + goal in NGN).
+- Anyone with the link can create a request (open access, not invite-only).
+- Donors give to a **specific request** via Paystack.
+- All payments are **held in the platform Paystack balance** before approval / payout (see §6.1).
+- Platform fee: **0%**.
+- Growth means more verified help, more donors, and more completed requests — **not** investment yield.
+
+### Explicitly not in v1
+- Crowdfunding-as-core model, shared pools, giving circles, NGO marketplace
+- Public “success story” pages after funding (completed requests become **private**)
+- Required category taxonomy
+- Formal bank-licensed escrow product (operational hold via Paystack is enough for v1)
+
+---
+
+## 2. Locked product rules (from client Q&A)
+
+### Access & requests
+| Rule | Decision |
+|---|---|
+| Who can create a request | **Anyone with the link** (open create flow) |
+| Max goal amount | **No maximum** |
+| Multiple open requests per person | **No** — one open request at a time |
+| Categories required in v1 | **No** |
+| After fully funded | Request becomes **private** |
+| Public identity on live requests | **Full name + photo** required |
+| Language | **English only** |
+
+### Money & operations
+| Rule | Decision |
+|---|---|
+| Platform fee | **0%** |
+| Where money sits before payout | **Paystack platform balance (operational escrow)** |
+| Payout cadence | **Weekly** |
+| If goal not reached by deadline | **Refund** donors |
+| Donor refunds allowed | **Yes** |
+| Paystack / legal owner | **Private entity** |
+
+### Trust & admin
+| Rule | Decision |
+|---|---|
+| Minimum verification | **NIN or phone number** |
+| Admin reviewer at launch | **Client (self)** |
+| Disallowed request types | **Yes** — see §8.1 suggested list |
+
+### Brand & UX
+| Rule | Decision |
+|---|---|
+| Name / domain | **Prosperax.org** |
+| Message | **Mutual aid** |
+| Design style | Rising Lion–inspired editorial layout ✅ |
+| Tone | **Hopeful community** |
+| Homepage must-include | **WhatsApp follow** |
+| Seed requests at planning time | **No** — soft-launch plan in §8.6 |
+
+---
+
+## 3. Product vision
+
+> **Prosperax** — hopeful mutual aid for Nigeria. Real people share verified needs; neighbors send help through Paystack; gifts are held safely until approval, paid out weekly, fees stay at zero, and trust stays visible.
 
 **Core loop**
-1. Someone creates a help request.
-2. Admin reviews / verifies.
-3. Donors discover the story and give.
-4. Funds are recorded and paid out to the recipient.
-5. The platform shows progress and impact — so trust and participation grow.
+1. Requester opens the create link and submits one help request (name, photo, story, goal, NIN **or** phone).
+2. Client admin reviews / approves (rejects disallowed content).
+3. Request goes **live**; donors discover and give via Paystack.
+4. Funds land in the **platform Paystack balance** (held until release).
+5. Donations accumulate toward the goal on the live page.
+6. **Weekly** payouts transfer eligible funds to approved recipients.
+7. If the deadline passes without reaching the goal → **refund** donors from held balance.
+8. When funded/closed → request becomes **private**.
 
-**Primary users (v1 assumption — confirm next meeting)**
-- **Requester:** person who needs help
-- **Donor:** person who wants to give to a specific story
-- **Admin:** reviews requests, manages payouts, handles abuse
+**Primary users**
+- **Requester** — needs help; only one open request
+- **Donor** — gives to a specific live request
+- **Admin (client)** — reviews, moderates, runs weekly payouts / refunds
 
 ---
 
-## 3. Design direction — inspired by Rising Lion Money
+## 4. Design direction (Prosperax × Rising Lion)
 
 Reference: [risinglionmoney.com](https://risinglionmoney.com/)
 
-We are **not cloning** that site. We are borrowing its **editorial confidence**: strong brand voice, story-first layout, continent/local pride, and shareable narrative blocks — then adapting them to mutual aid.
+Borrow editorial confidence; keep a hopeful mutual-aid identity in **green**. Do not copy markets/investing framing.
 
-### What to borrow
-| Rising Lion pattern | How we adapt it |
+### Adaptations under locked rules
+| Pattern | Prosperax application |
 |---|---|
-| Bold brand-led hero (“African money, on the move”) | Brand + one giving promise + one primary CTA |
-| Story franchises (“Rising of the Day”) | Recurring blocks like **Need of the Day**, **Helped this week**, **Impact update** |
-| Short, shareable story cards | Help-request cards: face/story hook + location + amount needed/raised |
-| Live ticker / pulse strip | Soft social proof: total given today, people helped, active requests (NGN) |
-| Quote / voice moments | Short beneficiary or donor quotes (trust, not hype) |
-| Clear dual paths (reader / partner) | Dual CTAs: **Send help** / **Request help** |
-| Mobile + WhatsApp-native distribution mindset | Easy share links; later WhatsApp updates (post-MVP ok) |
+| Brand-led hero | **Prosperax** as hero signal + mutual-aid promise + CTAs |
+| “Rising of the Day” | **Need of the Day** from *live* requests only |
+| Story cards | Name + photo + short hook + raised/goal (NGN) |
+| Pulse strip | Soft stats (given this week, open requests, people helped count) |
+| Dual paths | **Send help** / **Request help** |
+| WhatsApp | **Follow on WhatsApp** on home (must-have) |
+| After funding | No public personal success archive — aggregate hopeful stats only |
+| Trust copy | “Gifts held until approval · weekly payouts · Prosperax fee 0%” |
 
-### What *not* to copy
-- Markets / stock tickers / investing framing
-- Newsletter-media IA as the whole product
-- Sponsor-ad slots as a first-release priority
-- Any look that implies financial returns
+### Landing composition
+1. **Hero** — Prosperax + mutual-aid line + `Send help` / `Request help`
+2. **WhatsApp follow**
+3. **Pulse strip** — calm live stats
+4. **Need of the Day** — one live featured request
+5. **How it works** — Request → Verify → Give (held safely) → Weekly payout
+6. **Open requests** — browse live stories only
+7. **Trust** — hold-before-payout, 0% fee, NIN/phone verification, refund rule
+8. **Final CTA** — give or request + WhatsApp again
 
-### Visual principles (green, Nigeria-first)
-- **Brand first** in the opening viewport — name must read as the hero signal
-- **Green** as the trust/growth system color (not generic purple fintech)
-- **Editorial typography** — expressive display + readable body (avoid Inter/Roboto/Arial defaults)
-- **Atmosphere** — subtle texture/gradient + real Nigerian people/context imagery (not flat gray/white only)
-- **Full-bleed story hero** on landing; no card collage in the first viewport
-- **One job per section**
-- **Motion with purpose** (2–3): e.g. ticker fade, story card entrance, progress bar fill
-- Mobile-first; fast on common Nigerian connections
-
-### Landing page composition (draft)
-1. **Hero:** brand + one headline + one supporting line + CTA group (`Send help` / `Request help`)
-2. **Pulse strip:** live giving stats (kept calm, not casino-like)
-3. **Need of the Day:** one featured human story (Rising-of-the-Day equivalent)
-4. **How it works:** 3 steps (Request → Verify → Give)
-5. **Open requests:** story list (not dense dashboard)
-6. **Impact stories:** recently helped
-7. **Trust:** verification + Paystack + policies
-8. **Final CTA:** join as donor or requester
-
-### Key product screens (for next design pass)
-1. Home / editorial landing  
-2. Browse requests  
+### Key screens
+1. Home  
+2. Browse live requests  
 3. Request detail + donate  
-4. Create request  
-5. Donor / requester dashboard  
-6. Admin review queue  
-7. Static trust pages (About, How it works, Terms, Privacy)
+4. Create request (link-accessible)  
+5. Requester / donor dashboard  
+6. Admin review + weekly payout / refund tools  
+7. Trust/legal pages (About, How it works, Terms, Privacy, Refunds, Acceptable use)
+
+**Suggested tagline options (client can pick one)**
+- “Mutual aid for Nigeria.”
+- “Send help. Hold trust. Grow together.”
+- “Neighbor to neighbor — mutual aid, made clear.”
 
 ---
 
-## 4. MVP scope (Model A)
+## 5. MVP scope
 
-**Rough timeline:** 8–12 weeks after remaining product decisions are locked.
+**Suggested build window:** ~10–12 weeks after scaffolding starts (soft launch at end of Phase 4).
 
 ### In scope
-1. Editorial-style public landing (Rising Lion–inspired)
-2. Auth (email and/or phone — decide next)
-3. Create **Help Request** (story, category, goal in NGN, photos/docs)
-4. Browse / filter open requests
-5. Donate to a specific request via **Paystack**
-6. Raised vs goal + recent supporters
-7. Request statuses: draft → pending review → live → funded/closed
-8. Verification states: unverified / pending / verified
-9. Admin panel: approve/reject, flag abuse, mark payout sent
-10. Donation receipts + basic history
-11. Email (or SMS later) for donation received / request approved
+1. Prosperax marketing/home (Rising Lion–inspired, hopeful, WhatsApp follow)
+2. Auth: **phone OTP primary** + email for receipts (see §8.4)
+3. Create Help Request via open link  
+   - Fields: full name, photo, story, goal (NGN, no max), deadline (default 30 days), NIN **or** phone  
+   - Enforce **one open request per user**
+4. Browse / view **live** requests only
+5. Donate via Paystack into **platform balance hold**
+6. Progress: raised vs goal, supporters
+7. Statuses: `draft` → `pending_review` → `live` → `funded` / `closed_refunded` / `rejected`  
+   - Closed successful requests → **private**
+8. Admin: approve/reject, disallowed flags, **weekly payout batch**, **refund tools**
+9. Deadline handling: unmet goal → refund flow
+10. Receipts + basic history
+11. Email notifications (donation, approved, payout, refund)
+12. Policy pages (including Acceptable Use + Refunds)
 
 ### Out of scope for MVP
-- Native mobile apps
-- In-platform wallet / balance spending
-- Chat between donor and requester
-- Investment / interest products
-- Recurring donations (nice follow-up)
-- Multi-country expansion
-- Heavy automated KYC
-- Full WhatsApp bot (optional later; share links first)
+- Native apps, wallets, chat
+- Public post-funding story archive
+- Category system
+- Recurring donations
+- Multi-language / multi-country
+- Formal legal escrow bank product
+- Automated KYC beyond NIN-or-phone + manual review
+- WhatsApp bot (follow link/channel only)
 
 ---
 
-## 5. Architecture (unchanged stack, Model A naming)
+## 6. Architecture
 
 ```text
-[ Next.js Web App — editorial UX ]
+[ Next.js — Prosperax.org ]
         |
         | HTTPS / REST
         v
-[ FastAPI Backend ]
+[ FastAPI ]
         |
-        +--> PostgreSQL (users, help_requests, donations, payouts, audit)
-        +--> Paystack (checkout + webhooks + transfers)
-        +--> Object storage (request images / ID docs)
+        +--> PostgreSQL (users, help_requests, donations, payouts, refunds, audit)
+        +--> Paystack
+        |       - Checkout (collect)
+        |       - Manual payouts / settle-to-balance (HOLD)
+        |       - Transfers (weekly release to recipients)
+        |       - Refunds (unmet goal / donor refund)
+        +--> Object storage (photos)
         +--> Email provider
-        +--> Admin API / UI
+        +--> Admin tools
 ```
 
 ### Core entities
-- `User` (roles: requester, donor, admin — a user may be both requester and donor)
-- `HelpRequest` (story, goal_ngn, category, status, verification)
-- `Donation` (amount, donor, request, Paystack reference, status)
-- `Payout` (recipient account details, amount, status)
-- `MediaAsset`
-- `AuditLog`
+- `User` — requester/donor/admin; one-open-request constraint
+- `HelpRequest` — story, goal_ngn, deadline_at, status, visibility, verification_type (`nin`|`phone`)
+- `Donation` — amount, status, Paystack reference, payout_eligible_at
+- `PayoutBatch` / `Payout` — weekly settlement
+- `Refund` — unmet-goal or donor-requested
+- `MediaAsset`, `AuditLog`
 
-### Money flow (recommended default for next discussion)
-1. Donor pays via Paystack checkout to a **specific HelpRequest**.
-2. Platform confirms via **webhook** (idempotent).
-3. Request progress updates.
-4. Admin approves payout to verified recipient.
-5. Payout via Paystack Transfer (or manual bank payout in earliest launch).
+### 6.1 Fund holding / “escrow” (confirmed approach)
 
-**Still open:** instant vs periodic payout; platform fee; goal-not-reached behavior.
+**Client question:** *Can an escrow account be connected so all payments go there before approval?*  
+**Answer:** **Yes — for v1 we use operational escrow via Paystack**, not a separate bank escrow product.
+
+| Concept | Prosperax v1 choice |
+|---|---|
+| Operational hold | ✅ All successful donations settle into the **private entity’s Paystack balance** and stay there until admin-approved weekly release |
+| Formal legal escrow account | ❌ Not required for MVP; can be revisited with a bank/lawyer later |
+
+**Required Paystack setup**
+1. Registered **private entity** Paystack business account  
+2. Enable **[Manual payouts / settle to balance](https://support.paystack.com/en/articles/2131074)** so collections are not auto-swept only to bank before we can transfer  
+3. Use **[Transfers](https://support.paystack.com/en/articles/2132866)** for weekly recipient payouts  
+4. Use Paystack **Refunds** for unmet goals / eligible donor refunds  
+
+**Site behavior**
+1. Donor pays on a live HelpRequest.  
+2. Webhook confirms payment → donation recorded as `held`.  
+3. Public progress updates; money remains in platform balance.  
+4. Admin approval + weekly job moves eligible `held` donations → Transfer to requester.  
+5. Unmet goal / eligible refund → refund from balance; request may close as `closed_refunded`.  
+
+**Product copy suggestion:** “Your gift is held securely until the request is approved for payout.”  
+Avoid promising “bank escrow” unless a formal escrow product is later contracted.
+
+### Money flow (end-to-end)
+1. Donor → Paystack Checkout → **platform balance (hold)**  
+2. Backend webhook (idempotent) → mark donation successful / held  
+3. Live progress updates  
+4. Weekly payout batch → Paystack Transfer to recipient bank account  
+5. Missed goal by deadline → refund donors  
+6. Prosperax platform fee **0%**; show Paystack processing fees separately (§8.3)
 
 ---
 
-## 6. Non-functional priorities
+## 7. Non-functional priorities
 
-- Trust & safety (fake requests are the #1 brand risk)
-- Payment correctness (webhooks, reconciliation)
-- Transparency (fees, payout status, story updates)
-- Mobile performance
-- Security (auth, admin roles, document privacy)
-- Clear policies (terms, refunds, acceptable use)
+- Trust & safety under open create link  
+- Correct hold → weekly payout → refund ledger  
+- Privacy for non-live requests  
+- Clear 0% Prosperax fee vs Paystack fees  
+- Mobile performance · English-only  
+- Admin UX for a **single operator**
 
 ---
 
-## 7. Tech decisions
+## 8. Suggested defaults (formerly open points)
 
-| Area | Choice | Notes |
+These fill planning gaps so work can start. Client may override any row.
+
+### 8.1 Disallowed request types — **Suggested default**
+Publish under Acceptable Use. Admin must reject if present:
+
+1. Illegal activity under Nigerian law  
+2. Weapons, ammunition, or violent crime support  
+3. Drugs / controlled substances  
+4. Gambling, betting, or lottery funding  
+5. Hate, harassment, or discrimination  
+6. Adult / sexual content or exploitation  
+7. Political campaign financing or partisan propaganda  
+8. Investment, “money doubles,” crypto-get-rich, or any yield promise  
+9. Requests that impersonate others or use stolen photos/IDs  
+10. Fundraising for another person/org **without clear authorization/proof**  
+11. Clearly fraudulent, misleading, or duplicate spam requests  
+12. Anything that would make Paystack or banking partners block the merchant  
+
+### 8.2 Request deadline — **Suggested default: 30 days**
+- Default `deadline_at` = approve/live time + **30 days**  
+- Requester may choose 14 / 30 / 60 days at create time (optional UI); default 30  
+- Soft UI warning if goal looks extremely high for timeline (no hard max amount)
+
+### 8.3 Refund SLA — **Suggested default**
+| Case | Rule |
+|---|---|
+| Goal not reached by deadline | Auto-queue refunds within **3 business days** after deadline |
+| Donor-requested refund | Allowed if donation is still **held** (not yet included in a successful weekly payout), within **7 days** of payment |
+| After payout to recipient | **No automatic refund**; exceptional cases handled manually by admin |
+| Failed/duplicate charge | Full refund as soon as confirmed |
+
+Refunds use Paystack refund APIs back to the original payment method when possible.
+
+### 8.4 Fee display copy — **Suggested default**
+On donate UI + FAQ:
+
+> **Prosperax platform fee: 0%.**  
+> Payment processing is handled by Paystack. Paystack’s standard processing fees may apply and are charged by Paystack, not by Prosperax as a platform fee.
+
+### 8.5 Auth — **Suggested default**
+- **Primary:** Phone number + OTP (fits NG usage + verification option)  
+- **Also collect:** Email for receipts / payout notices  
+- Verification field on request: **NIN or phone** (phone may already be the login phone)  
+- Admin login: email + strong password (or same OTP), separate admin role
+
+### 8.6 WhatsApp follow — **Suggested default**
+- Homepage CTA: **Follow Prosperax on WhatsApp**  
+- Destination: client WhatsApp **Channel or Community** URL (placeholder until provided)  
+- Doc field to fill later: `WHATSAPP_FOLLOW_URL=…`  
+- Until URL exists, soft launch can use a temporary wa.me link to the client’s number/community
+
+### 8.7 Soft-launch plan — **Suggested default** (no seeds yet)
+1. **Week −2:** Client invites 5–10 trusted requesters privately (church/community/friends).  
+2. Create requests via the open link; admin approves only verified ones.  
+3. **Week −1:** Small donor circle tests real Paystack test → then live small donations.  
+4. Run one full **weekly payout** and one **refund test** before public marketing.  
+5. **Public launch:** Open WhatsApp + social only after ≥3 live requests are on the site.  
+6. Keep create-link sharing calm at first (avoid viral empty-feed problem).
+
+### 8.8 Launch targets — **Suggested default**
+| Item | Suggestion |
+|---|---|
+| Soft launch | ~10–12 weeks after build start |
+| Public push | After soft-launch checklist (§8.6) passes |
+| 90-day success metric | **10 completed weekly payout cycles**, **₦1–2M total verified donations**, **≥20 approved live requests over the period** |
+| Budget | Client to confirm; engineering assumes MVP scope in §5 only |
+
+### 8.9 Hosting — **Suggested default**
+| Layer | Suggestion |
+|---|---|
+| Frontend (Next.js) | Vercel |
+| API (FastAPI) | Render / Railway / Fly.io (pick one at scaffolding) |
+| Database | Managed PostgreSQL (e.g. Neon or Supabase Postgres) |
+| Files | S3-compatible (Cloudflare R2 or AWS S3) |
+| Email | Resend or Postmark |
+| Secrets | Environment vars + Paystack live keys only on production |
+
+---
+
+## 9. Decision log
+
+### Locked by client
+- Model A, Nigeria, English, green, Paystack, FastAPI/Postgres/Next.js  
+- Brand Prosperax.org, mutual aid, hopeful tone, Rising Lion–style UX, WhatsApp follow  
+- Open create link; no max goal; one open request; no categories  
+- Live: full name + photo; completed → private  
+- Verification: NIN or phone; admin = client  
+- Fee 0%; weekly payouts; unmet goal → refund; donor refunds yes  
+- Merchant = private entity  
+
+### Adopted as suggested defaults (v4)
+- Operational escrow via Paystack balance hold  
+- Disallowed types list (§8.1)  
+- 30-day default deadline  
+- Refund SLA (§8.3)  
+- Fee copy (§8.4)  
+- Phone OTP + email receipts  
+- Soft-launch plan (§8.6)  
+- 90-day metrics + hosting defaults (§8.8–8.9)  
+
+### Still needs client-provided values (non-blocking for PRD)
+1. Final WhatsApp follow URL  
+2. Exact private-entity legal name for Paystack + policies  
+3. Final tagline pick  
+4. Confirmed budget / hard launch calendar date  
+5. Any edits to disallowed list or refund SLA  
+
+---
+
+## 10. Confirmed Q&A record
+
+| # | Topic | Answer |
 |---|---|---|
-| Backend | FastAPI | Webhooks + strict validation |
-| DB | PostgreSQL | Money/state integrity |
-| Frontend | Next.js | SEO for request stories |
-| Payments | Paystack | Nigeria methods |
-| Files | S3-compatible | Photos + verification docs |
-| Hosting | TBD in tech kickoff | Keep simple for MVP |
+| 1 | Who can create | Anyone with the link |
+| 2 | Max goal | No |
+| 3 | Multiple open requests | No |
+| 4 | Required categories | No |
+| 5 | After funded visibility | Private |
+| 6 | Platform fee | 0% |
+| 7 | Payout timing | Weekly |
+| 8 | Goal not reached | Refund |
+| 9 | Donor refunds | Yes |
+| 10 | Legal / Paystack owner | Private entity |
+| 11 | Verification | NIN or phone number |
+| 12 | Admin | Client (self) |
+| 13 | Public identity | Full name + photo |
+| 14 | Disallowed types | Yes → §8.1 suggested list |
+| 15 | Brand / domain | Prosperax.org |
+| 16 | Tagline direction | Mutual aid |
+| 17 | Seed requests ready | No → soft launch §8.6 |
+| 18 | English only | Yes |
+| 19 | Rising Lion–style design | Yes |
+| 20 | Tone | Hopeful community |
+| 21 | Home must-have | WhatsApp follow |
+| — | Escrow / hold before approval | Yes → Paystack balance hold §6.1 |
 
 ---
 
-## 8. Decisions already made vs still open
+## 11. Next working session (~30–45 min)
 
-### Locked
-- Model **A** (peer mutual aid)
-- Nigeria focus
-- Green brand direction
-- Paystack
-- FastAPI + Postgres + Next.js
-- Design reference: Rising Lion Money editorial style
+Light confirmation only:
 
-### Open for next discussion
-See sections 9–10.
+1. Accept or edit **§8 suggested defaults** (deadline, refunds, disallowed list)  
+2. Provide **WhatsApp URL** + legal entity display name  
+3. Pick a **tagline**  
+4. Confirm Paystack manual-payout / settle-to-balance eligibility for the private entity  
+5. Approve start of **PRD + wireframes + repo scaffolding**
 
 ---
 
-## 9. Questions for next client discussion
+## 12. Suggestions (operating principles)
 
-### A. Product rules (Model A specifics)
-1. Can anyone create a help request, or only invited/verified users?
-2. Is there a **maximum goal amount** per request?
-3. Can a person have multiple open requests at once?
-4. Required categories for v1? (e.g. medical, school fees, food, rent, business restart)
-5. After a request is fully funded, can it stay public as an impact story?
-
-### B. Money & operations
-6. Platform fee? (0% at launch vs small % — must be shown clearly)
-7. Payout timing: on each donation, daily/weekly batch, or only when goal is reached?
-8. If goal is not reached by deadline: payout partial, extend, or refund?
-9. Refund policy for donors?
-10. Who owns the Paystack merchant account / legal entity?
-
-### C. Trust & verification
-11. Minimum verification before going live (phone? NIN? photo ID? utility bill? guarantor?)
-12. Who is the daily admin reviewer at launch?
-13. Public identity: full name + photo required, or partial anonymity allowed?
-14. Disallowed request types?
-
-### D. Brand & content
-15. Final product/brand name + domain?
-16. Tagline options (Rising-Lion energy, but about mutual aid — not markets)?
-17. Do we have 5–10 real seed requests for launch?
-18. English only for v1?
-
-### E. Design confirmation
-19. Confirm we should closely follow Rising Lion’s **editorial story layout**, while keeping our own green mutual-aid identity.
-20. Preference on tone: more hopeful community, more serious journalism, or mix?
-21. Any must-have sections on home (stats, quotes, WhatsApp follow, etc.)?
-
-### F. Delivery
-22. Target launch date / soft-launch community?
-23. Budget range and who supplies legal copy + photography?
-24. Success metric for 90 days (e.g. X completed helps, ₦Y donated, Z returning donors)?
+1. Always describe money as **held until payout**, not “invested.”  
+2. Mandatory admin review before `live` — open create is not auto-publish.  
+3. Hard-enforce one open request in the API.  
+4. Weekly payout + refunds are product features, not spreadsheet afterthoughts.  
+5. Soft-launch before public traffic.  
+6. North-star metric: **weekly successful payouts completed**.
 
 ---
 
-## 10. Agenda for next meeting (~60–90 min)
-
-1. **Recap locked decisions** (Model A + Rising Lion–inspired design)
-2. **Approve MVP feature list** (section 4) — cut or add
-3. **Money rules** (fee, payout timing, partial funding, refunds)
-4. **Verification playbook** (what is required before “Live”)
-5. **Brand kit basics** (name, tagline, green palette direction, tone)
-6. **Home page wireframe review** (hero → Need of the Day → requests → impact)
-7. **Launch seeding plan** (who provides first real stories)
-8. **Agree next artifacts:** short PRD + low-fi wireframes + Paystack account checklist
-
----
-
-## 11. Suggestions for this phase
-
-1. Keep v1 language as **help / give / request** — avoid crowdfunding or investment wording.
-2. Make **Need of the Day** the emotional center of the homepage (like Rising of the Day).
-3. Start with **manual admin verification**; automate later.
-4. Prefer **collect now, payout on approval** over instant peer wallet transfer.
-5. Seed **real Nigerian stories** before ads/traffic.
-6. Show **verification badges + payout status** publicly to borrow Rising Lion’s trust-through-clarity feel.
-7. Add shareable request links early (WhatsApp sharing matters in NG).
-8. North-star metric proposal: **verified donations completed per week**.
-
----
-
-## 12. Risks (updated for Model A)
+## 13. Risks
 
 | Risk | Why it matters | Mitigation |
 |---|---|---|
-| Fake personal hardship stories | Destroys trust fast | ID checks + manual review + public reporting |
-| Design feels like a news site, not a giving product | Users don’t know how to donate | Strong CTAs + donate path above the fold on request pages |
-| Empty request feed at launch | No reason to return | Seed 5–10 verified requests |
-| Payout delays / disputes | Donor & requester frustration | Clear SLA + status labels |
-| Overbuilding editorial features | Slows payments MVP | Ship story UI only where it helps giving |
+| No seed requests | Empty feed | Soft launch §8.6 |
+| Open create link | Abuse | Admin gate + §8.1 policy + NIN/phone |
+| No max goal | Unrealistic asks | Soft warnings + admin reject |
+| Hold/refund complexity | Ops errors | Ledger states: held → paid / refunded |
+| Single admin | Bottleneck | Simple queue + email alerts + weekly checklist |
+| Calling it “escrow” loosely | Legal confusion | Use “held in platform balance” in UI unless formal escrow exists |
+| Paystack fee confusion | Trust | §8.4 copy |
+| Manual payouts not enabled | Can’t hold for weekly release | Complete Paystack manual-payout setup before go-live |
 
 ---
 
-## 13. Delivery phases (adjusted)
+## 14. Delivery phases
 
-### Phase 0 — Discovery (current)
-- ✅ Model A locked  
-- ✅ Design reference chosen  
-- ⬜ Money rules + verification + brand name
+### Phase 0 — Discovery ✅
+- Model, brand, money rules, escrow approach, suggested defaults documented  
 
 ### Phase 1 — Foundation
-- Auth, HelpRequest CRUD, Paystack test donate, admin approve/reject
+- Auth (phone OTP), HelpRequest CRUD, one-open-request, Paystack test donate + webhook, admin approve/reject  
 
-### Phase 2 — Trust & story UX
-- Verification states, receipts, Need of the Day / impact blocks, share links
+### Phase 2 — Hold, payout, refund
+- Settle-to-balance hold states, weekly Transfer batch, unmet-goal refunds, donor refund path, private visibility  
 
-### Phase 3 — Launch readiness
-- Production Paystack, policies, seeded requests, monitoring
+### Phase 3 — Prosperax story UX
+- Home (Need of the Day, WhatsApp, trust/hold/0% fee), browse, share links  
 
-### Phase 4 — Growth
-- Recurring giving, better discovery, WhatsApp updates, payout automation, localization
+### Phase 4 — Launch readiness
+- Production Paystack, policies, monitoring, soft launch checklist  
 
----
-
-## 14. Immediate next steps
-
-1. Walk this v2 plan with the client using the agenda in section 10.
-2. Answer section 9 questions (especially money + verification).
-3. Lock brand name / tagline.
-4. Produce:
-   - 1-page PRD
-   - Low-fi wireframes for the 7 key screens
-   - Paystack go-live checklist
-5. Only then scaffold Next.js + FastAPI + Postgres.
+### Phase 5 — Growth
+- Discovery improvements, recurring giving, WhatsApp automation, localization later  
 
 ---
 
-## 15. Decision we want from the next meeting
+## 15. Immediate next steps
 
-> Confirm MVP money rules and verification rules so we can design Help Request + Donate flows without rework: **fee %, payout timing, partial-goal handling, and minimum ID requirements**.
-
-Once those are set, engineering and UI design can start in parallel.
+1. Client skims **§8** and notes any overrides.  
+2. Produce **Prosperax PRD (1–2 pages)** from this v4 plan.  
+3. Low-fi wireframes for the 7 key screens.  
+4. Paystack go-live checklist (business account, manual payouts/balance, transfers, refunds, webhooks).  
+5. Scaffold **Next.js + FastAPI + Postgres** on suggested hosting.
 
 ---
 
-*Planning draft for alignment — not a contract, quote, or legal opinion.*
+## 16. Current decision gate
+
+> Prosperax v1 rules are complete enough to design and build.  
+> **Operational escrow (Paystack balance hold → weekly Transfer after approval)** is the payment architecture.  
+> Next gate: quick confirm of §8 defaults + WhatsApp URL, then PRD / wireframes / scaffolding.
+
+---
+
+*Planning draft for alignment — not a contract, quote, or legal opinion. “Escrow” here means operational fund holding in the Paystack merchant balance until approved payout or refund. Paystack processing fees are separate from Prosperax’s 0% platform fee.*
