@@ -33,9 +33,10 @@ Work top to bottom. Check off each step when done. Do not skip money/webhook ste
 2. [ ] Implement tables:
    - `users`
    - `help_requests`
-   - `donations`
+   - `donations` (include fee snapshot columns)
    - `payouts` / `payout_batches`
    - `refunds`
+   - `app_settings`
    - `media_assets`
    - `audit_logs`
 3. [ ] Enums/constraints:
@@ -43,10 +44,11 @@ Work top to bottom. Check off each step when done. Do not skip money/webhook ste
    - donation statuses: `held | paid_out | refunded`
    - visibility: public only while `live`
    - **one open request per user** (DB partial unique index or app+DB check)
-4. [ ] File upload path config → local disk (e.g. `UPLOAD_DIR`)
-5. [ ] Seed script: one admin user
+4. [ ] Seed `app_settings` defaults (`platform_fee_percent=0`, deadlines, refund windows, min donation, WhatsApp URL, tagline, payout weekday)
+5. [ ] File upload path config → local disk (e.g. `UPLOAD_DIR`)
+6. [ ] Seed script: one admin user
 
-**Exit:** migrations apply cleanly; models match plan §5.
+**Exit:** migrations apply cleanly; models match plan §5 + settings.
 
 ---
 
@@ -62,6 +64,19 @@ Work top to bottom. Check off each step when done. Do not skip money/webhook ste
 8. [ ] Admin bootstrap (env `ADMIN_PHONES` or seed)
 
 **Exit:** requester/donor can log in; admin can access admin routes.
+
+---
+
+## Phase 2b — Admin settings API + UI
+
+1. [ ] `GET /settings/public` — fee %, min donation, WhatsApp URL, tagline, maintenance flag
+2. [ ] `GET /admin/settings` — full ops settings (admin only)
+3. [ ] `PATCH /admin/settings` — update keys with validation (e.g. fee 0–20)
+4. [ ] Audit log on every change
+5. [ ] Admin → Settings screen (platform fee first; other knobs listed in plan §1.1)
+6. [ ] Web donate/home read fee + copy from public settings (not hardcoded `0%`)
+
+**Exit:** admin can set fee to 0 and change it; UI reflects current value; secrets stay in `.env`.
 
 ---
 
@@ -86,14 +101,17 @@ Work top to bottom. Check off each step when done. Do not skip money/webhook ste
 
 1. [ ] Paystack test keys in api `.env`
 2. [ ] `POST /donations/initialize` — Checkout for a `live` request (amount NGN)
-3. [ ] Web donate UI on request detail (fee 0% + hold copy)
+   - read `platform_fee_percent` from settings
+   - compute/store `gross_amount`, `platform_fee_amount`, `net_to_request`, `fee_percent_snapshot`
+3. [ ] Web donate UI: show **current** platform fee + hold copy + Paystack fee note
 4. [ ] `POST /webhooks/paystack` — verify signature; idempotent by reference
-5. [ ] On success → `Donation.status = held`; update raised total
+5. [ ] On success → `Donation.status = held`; raised total uses **net_to_request** (amount toward goal)
 6. [ ] Show progress: raised vs goal, recent supporters
 7. [ ] Donor history: my donations
 8. [ ] Never trust frontend-only payment success
+9. [ ] Weekly payout transfers **net** amounts; platform fee stays in Paystack balance (when fee > 0)
 
-**Exit:** test donation completes; webhook marks `held`; progress updates.
+**Exit:** test donation completes; webhook marks `held`; fee snapshot stored; progress uses net.
 
 ---
 
@@ -118,7 +136,7 @@ Work top to bottom. Check off each step when done. Do not skip money/webhook ste
 
 1. [ ] Home (Rising Lion–inspired, mobile-first, green):
    - brand hero + Send help / Request help
-   - WhatsApp follow (`WHATSAPP_FOLLOW_URL`)
+   - WhatsApp follow (from settings `whatsapp_follow_url`)
    - pulse stats
    - Need of the Day
    - how it works (include hold → weekly payout)
@@ -128,7 +146,7 @@ Work top to bottom. Check off each step when done. Do not skip money/webhook ste
 3. [ ] Request detail + donate
 4. [ ] Create request flow
 5. [ ] User dashboard
-6. [ ] Admin console (review, payouts, refunds)
+6. [ ] Admin console (review, payouts, refunds, **settings**)
 7. [ ] Policy pages: About, How it works, Terms, Privacy, Refunds, Acceptable use (use plan disallowed list)
 
 **Exit:** all plan screens usable end-to-end on mobile + desktop.
@@ -174,7 +192,7 @@ Work top to bottom. Check off each step when done. Do not skip money/webhook ste
 1. [ ] Paystack live keys + manual payouts / settle-to-balance enabled
 2. [ ] Transfers + refunds verified with small real amounts
 3. [ ] Admin phone/login verified
-4. [ ] `WHATSAPP_FOLLOW_URL` set
+4. [ ] `whatsapp_follow_url` set in Admin Settings
 5. [ ] Legal entity name on policy pages
 6. [ ] One full path test: create → approve → donate → weekly payout
 7. [ ] One refund path test (held donation)
@@ -188,8 +206,8 @@ Work top to bottom. Check off each step when done. Do not skip money/webhook ste
 
 | Week | Focus |
 |---|---|
-| 1 | Phase 0–1 scaffolding + models |
-| 2 | Phase 2 auth |
+| 1 | Phase 0–1 scaffolding + models + settings seed |
+| 2 | Phase 2 auth + Phase 2b admin settings |
 | 3 | Phase 3 help requests + admin review |
 | 4 | Phase 4 Paystack donate/hold |
 | 5 | Phase 5 payouts + refunds |
