@@ -166,13 +166,16 @@ This is **operational escrow** (platform balance hold), not a separate bank escr
 
 ## 8. Build order
 
-1. VPS + Nginx + TLS + Postgres + PM2 (git pull → build → `pm2 restart`)  
-2. Auth (phone OTP) + users/roles  
-3. HelpRequest CRUD + admin approve/reject + one-open-request rule  
+Detailed checklist: [`docs/implementation-steps.md`](./implementation-steps.md)
+
+1. Repo scaffold (Next.js + FastAPI) + DB models  
+2. Auth (phone OTP) + roles  
+3. HelpRequest CRUD + admin approve/reject + one-open-request  
 4. Paystack Checkout + webhooks + held ledger  
 5. Weekly Transfer payout + refund jobs  
-6. Public UX (home, browse, detail, donate) + WhatsApp CTA  
-7. Policy pages + email notices · production Paystack go-live  
+6. Public UX + WhatsApp CTA + policy pages  
+7. Email notices  
+8. VPS deploy (Nginx + PM2) + production Paystack go-live  
 
 ---
 
