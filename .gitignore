@@ -1,0 +1,39 @@
+# Dependencies / envs
+node_modules/
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.Python
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Next.js
+apps/frontend/.next/
+apps/frontend/out/
+
+# Env / secrets
+.env
+.env.local
+.env.*.local
+!.env.example
+!**/.env.example
+
+# IDE / OS
+.idea/
+.vscode/
+*.swp
+.DS_Store
+Thumbs.db
+
+# Uploads / local data
+uploads/
+*.log
+pm2*.log
+
+# Build
+dist/
+build/
+coverage/
