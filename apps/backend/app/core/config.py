@@ -18,7 +18,35 @@ class Settings(BaseSettings):
     database_url: str = "postgresql+psycopg://postgres:postgres@localhost:5432/prosperax"
     upload_dir: str = str(BACKEND_ROOT / "uploads")
     admin_phone: str = "+2348000000000"
+    admin_phones: str = ""
     admin_email: str = "admin@prosperax.org"
+    jwt_secret: str = "change-me-in-production-prosperax"
+    jwt_expire_minutes: int = 60 * 24 * 7
+    otp_ttl_seconds: int = 600
+    otp_resend_seconds: int = 60
+    otp_max_attempts: int = 5
+    sms_provider: str = "console"
+    termii_api_key: str = ""
+    termii_sender_id: str = "Prosperax"
+
+    @property
+    def is_dev(self) -> bool:
+        return self.environment.lower() in {"development", "dev", "local"}
+
+    def admin_phone_list(self) -> list[str]:
+        from app.core.phone import InvalidPhoneError, normalize_ng_phone
+
+        raw = [self.admin_phone, *self.admin_phones.split(",")]
+        phones: list[str] = []
+        for item in raw:
+            item = item.strip()
+            if not item:
+                continue
+            try:
+                phones.append(normalize_ng_phone(item))
+            except InvalidPhoneError:
+                phones.append(item)
+        return list(dict.fromkeys(phones))
 
 
 settings = Settings()

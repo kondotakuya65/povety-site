@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 async function getHealth(): Promise<{
   ok: boolean;
   body?: {
@@ -34,14 +36,20 @@ export default async function HomePage() {
   return (
     <div className="mx-auto max-w-5xl px-4 py-16 sm:px-6">
       <p className="mb-3 text-sm font-semibold uppercase tracking-[0.14em] text-brand-mid">
-        Phase 0 scaffold
+        Mutual aid for Nigeria
       </p>
       <h1 className="font-display max-w-2xl text-4xl font-semibold text-ink sm:text-5xl">
-        Prosperax is standing up.
+        Send help. Hold trust. Grow together.
       </h1>
       <p className="mt-4 max-w-xl text-lg text-ink-muted">
-        Mutual aid for Nigeria. Frontend and backend are wired for local development.
+        Prosperax is standing up. Log in with your phone to continue.
       </p>
+      <Link
+        href="/login"
+        className="mt-8 inline-block bg-brand px-5 py-3 font-semibold text-white hover:bg-brand-deep"
+      >
+        Log in
+      </Link>
 
       <div className="mt-10 border border-line bg-surface-elevated p-5 sm:p-6">
         <h2 className="font-display text-xl font-semibold text-ink">Backend health</h2>

@@ -70,4 +70,14 @@ python -m app.scripts.seed    # admin user + app_settings (fee 0%)
 
 Uploads directory: `UPLOAD_DIR` (default `apps/backend/uploads`).
 
-Next: Phase 2 — phone OTP auth (`docs/implementation-steps.md`).
+## Auth (Phase 2)
+
+Phone OTP login. In development, `SMS_PROVIDER=console` prints the code and the API returns `dev_otp` (shown on the login page).
+
+- Login: http://localhost:3000/login  
+- Account (email for receipts): `/account`  
+- Admin ping: `/admin` (phones in `ADMIN_PHONE` / `ADMIN_PHONES`)
+
+Production SMS: set `SMS_PROVIDER=termii` and `TERMII_API_KEY`.
+
+Next: Phase 2b — admin settings (`docs/implementation-steps.md`).

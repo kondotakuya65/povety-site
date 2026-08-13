@@ -4,17 +4,26 @@ from sqlalchemy import select
 
 from app.core.config import settings
 from app.core.database import SessionLocal
+from app.core.phone import InvalidPhoneError, normalize_ng_phone
 from app.core.settings_defaults import DEFAULT_APP_SETTINGS
 from app.models import AppSetting, AuditLog, User, UserRole
+
+
+def _admin_phone() -> str:
+    try:
+        return normalize_ng_phone(settings.admin_phone)
+    except InvalidPhoneError:
+        return settings.admin_phone
 
 
 def seed() -> None:
     db = SessionLocal()
     try:
-        admin = db.scalar(select(User).where(User.phone == settings.admin_phone))
+        phone = _admin_phone()
+        admin = db.scalar(select(User).where(User.phone == phone))
         if admin is None:
             admin = User(
-                phone=settings.admin_phone,
+                phone=phone,
                 email=settings.admin_email,
                 role=UserRole.ADMIN.value,
             )
