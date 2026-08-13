@@ -29,24 +29,16 @@ Work top to bottom. Check off each step when done. Do not skip money/webhook ste
 
 ## Phase 1 — Database & domain models
 
-1. [ ] Choose ORM/migrations (recommend SQLAlchemy 2 + Alembic)
-2. [ ] Implement tables:
-   - `users`
-   - `help_requests`
-   - `donations` (include fee snapshot columns)
-   - `payouts` / `payout_batches`
-   - `refunds`
-   - `app_settings`
-   - `media_assets`
-   - `audit_logs`
-3. [ ] Enums/constraints:
+1. [x] ORM/migrations: SQLAlchemy 2 + Alembic
+2. [x] Tables: `users`, `help_requests`, `donations` (fee snapshot columns), `payouts` / `payout_batches`, `refunds`, `app_settings`, `media_assets`, `audit_logs`
+3. [x] Enums/constraints:
    - request statuses: `draft | pending_review | live | funded | closed_refunded | rejected`
    - donation statuses: `held | paid_out | refunded`
-   - visibility: public only while `live`
-   - **one open request per user** (DB partial unique index or app+DB check)
-4. [ ] Seed `app_settings` defaults (`platform_fee_percent=0`, deadlines, refund windows, min donation, WhatsApp URL, tagline, payout weekday)
-5. [ ] File upload path config → local disk (e.g. `UPLOAD_DIR`)
-6. [ ] Seed script: one admin user
+   - visibility: public only while `live` (CHECK)
+   - **one open request per user** (partial unique index on `draft|pending_review|live`)
+4. [x] Seed `app_settings` defaults (`platform_fee_percent=0`, deadlines, refund windows, min donation, WhatsApp URL, tagline, payout weekday)
+5. [x] File upload path config → `UPLOAD_DIR` (local disk)
+6. [x] Seed script: one admin user (`python -m app.scripts.seed`)
 
 **Exit:** migrations apply cleanly; models match plan §5 + settings.
 
@@ -219,7 +211,8 @@ Work top to bottom. Check off each step when done. Do not skip money/webhook ste
 
 ## First concrete action (start now)
 
-1. ~~Scaffold `apps/frontend` + `apps/backend`~~ (done — Phase 0)  
-2. Phase 1: Alembic + initial migration for core tables  
+1. ~~Scaffold `apps/frontend` + `apps/backend`~~ (Phase 0)  
+2. ~~Alembic + core tables + settings/admin seed~~ (Phase 1)  
+3. Phase 2: phone OTP auth  
 
 Say when to start Phase 0 in the repo and implementation can begin immediately.
