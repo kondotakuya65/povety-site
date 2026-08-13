@@ -4,6 +4,7 @@ async function getHealth(): Promise<{
     status: string;
     service: string;
     environment: string;
+    database?: string;
     time: string;
   };
   error?: string;
@@ -57,6 +58,10 @@ export default async function HomePage() {
             <div>
               <dt className="text-ink-muted">Environment</dt>
               <dd className="font-medium text-ink">{health.body.environment}</dd>
+            </div>
+            <div>
+              <dt className="text-ink-muted">Database</dt>
+              <dd className="font-medium text-ink">{health.body.database ?? "n/a"}</dd>
             </div>
             <div>
               <dt className="text-ink-muted">Time (UTC)</dt>

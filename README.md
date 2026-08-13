@@ -33,6 +33,12 @@ python -m venv .venv
 
 pip install -r requirements.txt
 copy .env.example .env   # or: cp .env.example .env
+
+# Postgres: create DB once
+# CREATE DATABASE prosperax;
+
+alembic upgrade head
+python -m app.scripts.seed
 uvicorn app.main:app --reload --port 8000
 ```
 
@@ -50,12 +56,18 @@ npm run dev
 App: http://localhost:3000  
 Browser `/api/*` is rewritten to the backend (`BACKEND_URL`, default `http://127.0.0.1:8000`).
 
-## Phase 0 exit
+## Database (Phase 1)
 
-- [x] `apps/frontend` + `apps/backend` scaffold
-- [x] `.env.example` files
-- [x] `GET /api/health`
-- [x] Frontend can reach backend health
-- [x] Green Prosperax base theme + layout shell
+Local Postgres is required. `.env` `DATABASE_URL` default:
 
-Next: Phase 1 — database models (see `docs/implementation-steps.md`).
+`postgresql+psycopg://postgres:postgres@localhost:5432/prosperax`
+
+```bash
+cd apps/backend
+alembic upgrade head          # schema
+python -m app.scripts.seed    # admin user + app_settings (fee 0%)
+```
+
+Uploads directory: `UPLOAD_DIR` (default `apps/backend/uploads`).
+
+Next: Phase 2 — phone OTP auth (`docs/implementation-steps.md`).
