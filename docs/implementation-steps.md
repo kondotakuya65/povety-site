@@ -10,20 +10,20 @@ Work top to bottom. Check off each step when done. Do not skip money/webhook ste
 
 ## Phase 0 — Repo & local foundation
 
-1. [ ] Create monorepo layout:
-   - `apps/web` — Next.js
-   - `apps/api` — FastAPI
+1. [x] Create monorepo layout:
+   - `apps/frontend` — Next.js
+   - `apps/backend` — FastAPI
    - `docs/` — plans (already present)
-2. [ ] Init Next.js (App Router, TypeScript) in `apps/web`
-3. [ ] Init FastAPI + Poetry/pip + `uvicorn` in `apps/api`
-4. [ ] Add root `README` with local run commands only
-5. [ ] Add `.env.example` for web + api (no secrets committed)
-6. [ ] Local Postgres (or Docker **only for local DB** if needed; production stays bare VPS)
-7. [ ] API health route `GET /api/health`
-8. [ ] Web can call API in local/dev
-9. [ ] Shared design tokens: green palette CSS variables, fonts, base layout shell
+2. [x] Init Next.js (App Router, TypeScript) in `apps/frontend`
+3. [x] Init FastAPI + pip + `uvicorn` in `apps/backend`
+4. [x] Add root `README` with local run commands only
+5. [x] Add `.env.example` for frontend + backend (no secrets committed)
+6. [x] Local Postgres noted for Phase 1 (production stays bare VPS)
+7. [x] API health route `GET /api/health`
+8. [x] Frontend can call backend in local/dev (Next rewrite + health panel)
+9. [x] Shared design tokens: green palette CSS variables, fonts, base layout shell
 
-**Exit:** `web` and `api` run locally; health OK.
+**Exit:** `frontend` and `backend` run locally; health OK.
 
 ---
 
@@ -171,8 +171,8 @@ Work top to bottom. Check off each step when done. Do not skip money/webhook ste
 4. [ ] Clone repo; production `.env` (Paystack, SMS, SMTP, secrets)
 5. [ ] Run migrations
 6. [ ] Build Next.js; configure PM2 ecosystem:
-   - `prosperax-web` → `next start` (:3000)
-   - `prosperax-api` → uvicorn (:8000)
+   - `prosperax-frontend` → `next start` (:3000)
+   - `prosperax-backend` → uvicorn (:8000)
 7. [ ] `pm2 startup` + `pm2 save`
 8. [ ] Nginx:
    - `/` → `127.0.0.1:3000`
@@ -181,7 +181,7 @@ Work top to bottom. Check off each step when done. Do not skip money/webhook ste
    - TLS via Let’s Encrypt
 9. [ ] Cron on VPS: weekly payout trigger + daily deadline/refund sweep (hit admin job endpoints or CLI)
 10. [ ] Confirm Paystack webhook URL: `https://prosperax.org/api/webhooks/paystack`
-11. [ ] Deploy runbook: `git pull` → migrate → build → `pm2 restart prosperax-web prosperax-api`
+11. [ ] Deploy runbook: `git pull` → migrate → build → `pm2 restart prosperax-frontend prosperax-backend`
 
 **Exit:** site live on HTTPS; PM2 processes stable; webhook reachable.
 
@@ -219,8 +219,7 @@ Work top to bottom. Check off each step when done. Do not skip money/webhook ste
 
 ## First concrete action (start now)
 
-1. Scaffold `apps/web` (Next.js) and `apps/api` (FastAPI)  
-2. Add `.env.example`, health endpoint, green base theme  
-3. Add Alembic + initial migration for core tables  
+1. ~~Scaffold `apps/frontend` + `apps/backend`~~ (done — Phase 0)  
+2. Phase 1: Alembic + initial migration for core tables  
 
 Say when to start Phase 0 in the repo and implementation can begin immediately.

@@ -139,8 +139,8 @@ Paystack keys, SMS keys, SMTP password, JWT secret, DB URL, `UPLOAD_DIR`, bootst
 
 | Component | On VPS |
 |---|---|
-| Frontend | Next.js (`next start`) managed by **PM2** |
-| Backend | FastAPI via **uvicorn**, managed by **PM2** |
+| Frontend | `apps/frontend` — Next.js (`next start`) via **PM2** |
+| Backend | `apps/backend` — FastAPI/uvicorn via **PM2** |
 | Reverse proxy | **Nginx** → `/` → `:3000`, `/api` → `:8000`, `/media` → uploads |
 | TLS | Let's Encrypt (certbot) on Nginx |
 | DB | PostgreSQL on the same VPS |
@@ -153,9 +153,9 @@ Paystack keys, SMS keys, SMTP password, JWT secret, DB URL, `UPLOAD_DIR`, bootst
 **Deploy pattern**
 1. Install Node, Python, PostgreSQL, Nginx, PM2 on the VPS.  
 2. Build Next.js (`npm run build`); run API with uvicorn.  
-3. PM2 ecosystem (example processes): `prosperax-web`, `prosperax-api` — `pm2 startup` + `pm2 save`.  
+3. PM2 ecosystem (example processes): `prosperax-frontend`, `prosperax-backend` — `pm2 startup` + `pm2 save`.  
 4. Nginx terminates SSL and proxies to the PM2-managed ports.  
-5. Deploy updates: `git pull` → build → `pm2 restart prosperax-web prosperax-api`.
+5. Deploy updates: `git pull` → build → `pm2 restart prosperax-frontend prosperax-backend`.
 
 **Paystack (external — required)**  
 Checkout · Manual payouts / settle-to-balance (hold) · Transfers (weekly) · Refunds · Webhooks → `https://prosperax.org/api/...`
@@ -203,7 +203,7 @@ This is **operational escrow** (platform balance hold), not a separate bank escr
 
 Detailed checklist: [`docs/implementation-steps.md`](./implementation-steps.md)
 
-1. Repo scaffold (Next.js + FastAPI) + DB models  
+1. Repo scaffold (`apps/frontend` + `apps/backend`) + DB models  
 2. Auth (phone OTP) + roles  
 3. HelpRequest CRUD + admin approve/reject + one-open-request  
 4. Paystack Checkout + webhooks + held ledger  
