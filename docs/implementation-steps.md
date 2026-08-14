@@ -61,12 +61,12 @@ Work top to bottom. Check off each step when done. Do not skip money/webhook ste
 
 ## Phase 2b — Admin settings API + UI
 
-1. [ ] `GET /settings/public` — fee %, min donation, WhatsApp URL, tagline, maintenance flag
-2. [ ] `GET /admin/settings` — full ops settings (admin only)
-3. [ ] `PATCH /admin/settings` — update keys with validation (e.g. fee 0–20)
-4. [ ] Audit log on every change
-5. [ ] Admin → Settings screen (platform fee first; other knobs listed in plan §1.1)
-6. [ ] Web donate/home read fee + copy from public settings (not hardcoded `0%`)
+1. [x] `GET /api/settings/public` — fee %, min donation, WhatsApp URL, tagline, maintenance flag
+2. [x] `GET /api/admin/settings` — full ops settings (admin only)
+3. [x] `PATCH /api/admin/settings` — update keys with validation (e.g. fee 0–20)
+4. [x] Audit log on every change
+5. [x] Admin → Settings screen (`/admin/settings`)
+6. [x] Home reads fee/tagline/WhatsApp/min donation from public settings
 
 **Exit:** admin can set fee to 0 and change it; UI reflects current value; secrets stay in `.env`.
 
@@ -214,6 +214,7 @@ Work top to bottom. Check off each step when done. Do not skip money/webhook ste
 1. ~~Scaffold `apps/frontend` + `apps/backend`~~ (Phase 0)  
 2. ~~Alembic + core tables + settings/admin seed~~ (Phase 1)  
 3. ~~Phone OTP auth~~ (Phase 2)  
-4. Phase 2b: admin settings API + UI  
+4. ~~Admin settings API + UI~~ (Phase 2b)  
+5. Phase 3: help requests + admin review  
 
 Say when to start Phase 0 in the repo and implementation can begin immediately.

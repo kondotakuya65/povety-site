@@ -80,4 +80,10 @@ Phone OTP login. In development, `SMS_PROVIDER=console` prints the code and the 
 
 Production SMS: set `SMS_PROVIDER=termii` and `TERMII_API_KEY`.
 
-Next: Phase 2b — admin settings (`docs/implementation-steps.md`).
+## Settings (Phase 2b)
+
+- Public: `GET /api/settings/public`
+- Admin UI: http://localhost:3000/admin/settings
+- Fee starts at `0`; change anytime without redeploy
+
+Next: Phase 3 — help requests (`docs/implementation-steps.md`).

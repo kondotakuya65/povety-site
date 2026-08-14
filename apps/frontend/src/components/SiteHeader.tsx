@@ -45,9 +45,14 @@ export default function SiteHeader() {
                 Account
               </Link>
               {isAdmin(user) ? (
-                <Link href="/admin" className="text-ink-muted hover:text-brand">
-                  Admin
-                </Link>
+                <>
+                  <Link href="/admin" className="text-ink-muted hover:text-brand">
+                    Admin
+                  </Link>
+                  <Link href="/admin/settings" className="text-ink-muted hover:text-brand">
+                    Settings
+                  </Link>
+                </>
               ) : null}
               <button type="button" onClick={logout} className="text-brand hover:text-brand-deep">
                 Log out
