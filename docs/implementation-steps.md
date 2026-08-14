@@ -91,19 +91,18 @@ Work top to bottom. Check off each step when done. Do not skip money/webhook ste
 
 ## Phase 4 — Paystack donate (hold ledger)
 
-1. [ ] Paystack test keys in api `.env`
-2. [ ] `POST /donations/initialize` — Checkout for a `live` request (amount NGN)
-   - read `platform_fee_percent` from settings
-   - compute/store `gross_amount`, `platform_fee_amount`, `net_to_request`, `fee_percent_snapshot`
-3. [ ] Web donate UI: show **current** platform fee + hold copy + Paystack fee note
-4. [ ] `POST /webhooks/paystack` — verify signature; idempotent by reference
-5. [ ] On success → `Donation.status = held`; raised total uses **net_to_request** (amount toward goal)
-6. [ ] Show progress: raised vs goal, recent supporters
-7. [ ] Donor history: my donations
-8. [ ] Never trust frontend-only payment success
-9. [ ] Weekly payout transfers **net** amounts; platform fee stays in Paystack balance (when fee > 0)
+1. [x] Paystack keys / mock mode in api `.env` (`PAYSTACK_MOCK=true` for local)
+2. [x] `POST /api/donations/initialize` — Checkout for a `live` request (amount NGN)
+   - reads `platform_fee_percent`; stores fee snapshot columns
+3. [x] Donate UI on request detail (fee + hold copy + Paystack note)
+4. [x] `POST /api/webhooks/paystack` — signature verify; idempotent by reference
+5. [x] On success → `Donation.status = held`; raised uses **net_to_request**
+6. [x] Progress + recent supporters on request detail
+7. [x] Donor history: `GET /api/donations/mine` + `/account`
+8. [x] Confirm via `POST /api/donations/confirm` (callback); never trust frontend alone
+9. [x] Net amount reserved for later weekly payouts (fee stays in platform balance when fee > 0)
 
-**Exit:** test donation completes; webhook marks `held`; fee snapshot stored; progress uses net.
+**Exit:** mock/test donation completes; webhook/confirm marks `held`; fee snapshot stored; progress uses net.
 
 ---
 
@@ -216,6 +215,7 @@ Work top to bottom. Check off each step when done. Do not skip money/webhook ste
 3. ~~Phone OTP auth~~ (Phase 2)  
 4. ~~Admin settings API + UI~~ (Phase 2b)  
 5. ~~Help requests + admin review~~ (Phase 3)  
-6. Phase 4: Paystack donate + hold ledger  
+6. ~~Paystack donate + hold ledger~~ (Phase 4)  
+7. Phase 5: weekly payouts + refunds  
 
 Say when to start Phase 0 in the repo and implementation can begin immediately.

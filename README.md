@@ -94,4 +94,20 @@ Production SMS: set `SMS_PROVIDER=termii` and `TERMII_API_KEY`.
 - Admin review: `/admin` (approve / reject pending)
 - Photos served at `/media/...`
 
-Next: Phase 4 — Paystack donate (`docs/implementation-steps.md`).
+## Donations (Phase 4)
+
+Local mock (default): `PAYSTACK_MOCK=true` — checkout redirects to `/donate/callback` and confirms without real Paystack.
+
+Real Paystack later:
+```
+PAYSTACK_MOCK=false
+PAYSTACK_SECRET_KEY=sk_test_...
+PAYSTACK_PUBLIC_KEY=pk_test_...
+```
+
+- Donate on live request detail
+- Callback confirm: `/donate/callback`
+- Webhook: `POST /api/webhooks/paystack`
+- Account shows donation history
+
+Next: Phase 5 — weekly payouts + refunds (`docs/implementation-steps.md`).

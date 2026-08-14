@@ -7,10 +7,20 @@ import { api, ApiError } from "@/lib/api";
 import { AuthUser, clearSession, getToken } from "@/lib/auth";
 import { HelpRequest, formatNgn, statusLabel } from "@/lib/helpRequests";
 
+type MyDonation = {
+  id: string;
+  status: string;
+  gross_amount: number;
+  net_to_request: number;
+  created_at: string | null;
+  help_request?: { id: string; full_name: string; status: string };
+};
+
 export default function AccountPage() {
   const router = useRouter();
   const [user, setUser] = useState<AuthUser | null>(null);
   const [mine, setMine] = useState<HelpRequest[]>([]);
+  const [donations, setDonations] = useState<MyDonation[]>([]);
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -24,11 +34,13 @@ export default function AccountPage() {
     Promise.all([
       api<AuthUser>("/api/auth/me"),
       api<{ items: HelpRequest[] }>("/api/help-requests/mine"),
+      api<{ items: MyDonation[] }>("/api/donations/mine"),
     ])
-      .then(([me, requests]) => {
+      .then(([me, requests, giftHistory]) => {
         setUser(me);
         setEmail(me.email ?? "");
         setMine(requests.items);
+        setDonations(giftHistory.items);
       })
       .catch(() => {
         clearSession();
@@ -99,6 +111,34 @@ export default function AccountPage() {
           </div>
         ) : (
           <p className="mt-3 text-sm text-ink-muted">No open request yet.</p>
+        )}
+      </section>
+
+      <section className="mt-8 border border-line bg-surface-elevated p-5">
+        <h2 className="font-display text-xl font-semibold text-ink">My donations</h2>
+        {donations.length === 0 ? (
+          <p className="mt-3 text-sm text-ink-muted">No donations yet.</p>
+        ) : (
+          <ul className="mt-4 space-y-3 text-sm">
+            {donations.map((donation) => (
+              <li key={donation.id} className="border-b border-line pb-3">
+                <p className="font-medium text-ink">
+                  {donation.help_request?.full_name ?? "Help request"}
+                </p>
+                <p className="mt-1 text-ink-muted">
+                  {formatNgn(donation.gross_amount)} · {statusLabel(donation.status)}
+                </p>
+                {donation.help_request ? (
+                  <Link
+                    href={`/requests/${donation.help_request.id}`}
+                    className="mt-1 inline-block text-brand hover:underline"
+                  >
+                    View
+                  </Link>
+                ) : null}
+              </li>
+            ))}
+          </ul>
         )}
       </section>
 

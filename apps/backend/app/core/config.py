@@ -28,10 +28,20 @@ class Settings(BaseSettings):
     sms_provider: str = "console"
     termii_api_key: str = ""
     termii_sender_id: str = "Prosperax"
+    paystack_secret_key: str = ""
+    paystack_public_key: str = ""
+    paystack_mock: bool = True
+    frontend_url: str = "http://localhost:3000"
 
     @property
     def is_dev(self) -> bool:
         return self.environment.lower() in {"development", "dev", "local"}
+
+    @property
+    def paystack_is_mock(self) -> bool:
+        if self.paystack_mock:
+            return True
+        return not bool(self.paystack_secret_key.strip())
 
     def admin_phone_list(self) -> list[str]:
         from app.core.phone import InvalidPhoneError, normalize_ng_phone
