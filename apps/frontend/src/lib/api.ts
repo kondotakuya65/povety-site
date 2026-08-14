@@ -33,10 +33,20 @@ export async function api<T>(path: string, options: ApiOptions = {}): Promise<T>
   }
 
   if (!res.ok) {
-    const detail =
-      typeof data === "object" && data && "detail" in data
-        ? String((data as { detail: unknown }).detail)
-        : res.statusText;
+    let detail = res.statusText;
+    if (typeof data === "object" && data && "detail" in data) {
+      const raw = (data as { detail: unknown }).detail;
+      if (typeof raw === "string") detail = raw;
+      else if (Array.isArray(raw)) {
+        detail = raw
+          .map((item) =>
+            typeof item === "object" && item && "msg" in item
+              ? String((item as { msg: unknown }).msg)
+              : String(item),
+          )
+          .join("; ");
+      } else detail = String(raw);
+    }
     throw new ApiError(res.status, detail);
   }
   return data as T;

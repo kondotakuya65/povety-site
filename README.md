@@ -86,4 +86,12 @@ Production SMS: set `SMS_PROVIDER=termii` and `TERMII_API_KEY`.
 - Admin UI: http://localhost:3000/admin/settings
 - Fee starts at `0`; change anytime without redeploy
 
-Next: Phase 3 — help requests (`docs/implementation-steps.md`).
+## Help requests (Phase 3)
+
+- Create: `/requests/new` (login required)
+- Browse live: `/requests`
+- Detail: `/requests/[id]`
+- Admin review: `/admin` (approve / reject pending)
+- Photos served at `/media/...`
+
+Next: Phase 4 — Paystack donate (`docs/implementation-steps.md`).

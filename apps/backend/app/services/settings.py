@@ -123,6 +123,13 @@ def get_settings_map(db: Session) -> dict[str, AppSetting]:
     return {row.key: row for row in rows}
 
 
+def get_setting_value(db: Session, key: str, default: object | None = None) -> object | None:
+    row = db.get(AppSetting, key)
+    if row is None:
+        return default
+    return coerce_setting_value(row.value_type, row.value)
+
+
 def get_public_settings(db: Session) -> dict:
     settings_map = get_settings_map(db)
     out: dict = {}

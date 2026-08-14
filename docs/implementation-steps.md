@@ -74,18 +74,18 @@ Work top to bottom. Check off each step when done. Do not skip money/webhook ste
 
 ## Phase 3 — Help requests + admin review
 
-1. [ ] `POST /help-requests` — create (open link; auth required)
-   - fields: full name, photo, story, goal_ngn, deadline (14/30/60, default 30), NIN **or** phone
-2. [ ] Enforce one open request (`pending_review` or `live`)
-3. [ ] Photo upload to local disk; save `MediaAsset`
-4. [ ] Status starts `pending_review`
-5. [ ] Admin list pending; approve → `live` (+ set `deadline_at`); reject → `rejected`
-6. [ ] Public list/detail: **only `live`**
-7. [ ] On `funded` / closed success → set visibility private
-8. [ ] User dashboard: my request + status
-9. [ ] Audit log for approve/reject
+1. [x] `POST /api/help-requests` — create (auth + multipart photo)
+   - fields: full name, photo, story, goal_ngn, deadline (14/30/60), NIN **or** phone
+2. [x] Enforce one open request (`draft|pending_review|live`)
+3. [x] Photo upload to local disk; `MediaAsset` + `/media/...`
+4. [x] Status starts `pending_review`
+5. [x] Admin list pending; approve → `live` (+ `deadline_at`); reject → `rejected`
+6. [x] Public list/detail: **only `live`** (owners/admins can view own non-public)
+7. [x] Non-live stays **private** (visibility CHECK)
+8. [x] User dashboard: my request + status (`/account`)
+9. [x] Audit log for create / approve / reject
 
-**Exit:** full create → review → live → private-on-close path works without payments.
+**Exit:** full create → review → live path works without payments.
 
 ---
 
@@ -215,6 +215,7 @@ Work top to bottom. Check off each step when done. Do not skip money/webhook ste
 2. ~~Alembic + core tables + settings/admin seed~~ (Phase 1)  
 3. ~~Phone OTP auth~~ (Phase 2)  
 4. ~~Admin settings API + UI~~ (Phase 2b)  
-5. Phase 3: help requests + admin review  
+5. ~~Help requests + admin review~~ (Phase 3)  
+6. Phase 4: Paystack donate + hold ledger  
 
 Say when to start Phase 0 in the repo and implementation can begin immediately.
