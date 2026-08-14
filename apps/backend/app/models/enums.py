@@ -33,6 +33,7 @@ class VerificationType(StrEnum):
 
 
 class DonationStatus(StrEnum):
+    PENDING = "pending"
     HELD = "held"
     PAID_OUT = "paid_out"
     REFUNDED = "refunded"

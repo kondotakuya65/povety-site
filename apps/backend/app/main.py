@@ -4,10 +4,13 @@ from pathlib import Path
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 
 from app.api.admin import router as admin_router
 from app.api.auth import router as auth_router
+from app.api.donations import router as donations_router
 from app.api.health import router as health_router
+from app.api.help_requests import router as help_requests_router
 from app.api.settings import router as settings_router
 from app.core.config import settings
 
@@ -32,4 +35,7 @@ app.add_middleware(
 app.include_router(health_router, prefix="/api")
 app.include_router(auth_router, prefix="/api")
 app.include_router(settings_router, prefix="/api")
+app.include_router(help_requests_router, prefix="/api")
+app.include_router(donations_router, prefix="/api")
 app.include_router(admin_router, prefix="/api")
+app.mount("/media", StaticFiles(directory=settings.upload_dir), name="media")

@@ -86,4 +86,28 @@ Production SMS: set `SMS_PROVIDER=termii` and `TERMII_API_KEY`.
 - Admin UI: http://localhost:3000/admin/settings
 - Fee starts at `0`; change anytime without redeploy
 
-Next: Phase 3 — help requests (`docs/implementation-steps.md`).
+## Help requests (Phase 3)
+
+- Create: `/requests/new` (login required)
+- Browse live: `/requests`
+- Detail: `/requests/[id]`
+- Admin review: `/admin` (approve / reject pending)
+- Photos served at `/media/...`
+
+## Donations (Phase 4)
+
+Local mock (default): `PAYSTACK_MOCK=true` — checkout redirects to `/donate/callback` and confirms without real Paystack.
+
+Real Paystack later:
+```
+PAYSTACK_MOCK=false
+PAYSTACK_SECRET_KEY=sk_test_...
+PAYSTACK_PUBLIC_KEY=pk_test_...
+```
+
+- Donate on live request detail
+- Callback confirm: `/donate/callback`
+- Webhook: `POST /api/webhooks/paystack`
+- Account shows donation history
+
+Next: Phase 5 — weekly payouts + refunds (`docs/implementation-steps.md`).

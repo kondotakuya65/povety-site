@@ -1,13 +1,26 @@
 "use client";
 
+import Link from "next/link";
 import { FormEvent, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { api, ApiError } from "@/lib/api";
 import { AuthUser, clearSession, getToken } from "@/lib/auth";
+import { HelpRequest, formatNgn, statusLabel } from "@/lib/helpRequests";
+
+type MyDonation = {
+  id: string;
+  status: string;
+  gross_amount: number;
+  net_to_request: number;
+  created_at: string | null;
+  help_request?: { id: string; full_name: string; status: string };
+};
 
 export default function AccountPage() {
   const router = useRouter();
   const [user, setUser] = useState<AuthUser | null>(null);
+  const [mine, setMine] = useState<HelpRequest[]>([]);
+  const [donations, setDonations] = useState<MyDonation[]>([]);
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -18,10 +31,16 @@ export default function AccountPage() {
       router.replace("/login");
       return;
     }
-    api<AuthUser>("/api/auth/me")
-      .then((me) => {
+    Promise.all([
+      api<AuthUser>("/api/auth/me"),
+      api<{ items: HelpRequest[] }>("/api/help-requests/mine"),
+      api<{ items: MyDonation[] }>("/api/donations/mine"),
+    ])
+      .then(([me, requests, giftHistory]) => {
         setUser(me);
         setEmail(me.email ?? "");
+        setMine(requests.items);
+        setDonations(giftHistory.items);
       })
       .catch(() => {
         clearSession();
@@ -49,16 +68,14 @@ export default function AccountPage() {
   }
 
   if (!user) {
-    return (
-      <div className="mx-auto max-w-lg px-4 py-16 text-ink-muted sm:px-6">Loading…</div>
-    );
+    return <div className="mx-auto max-w-lg px-4 py-16 text-ink-muted sm:px-6">Loading…</div>;
   }
+
+  const open = mine.find((item) => ["draft", "pending_review", "live"].includes(item.status));
 
   return (
     <div className="mx-auto max-w-lg px-4 py-16 sm:px-6">
-      <p className="mb-3 text-sm font-semibold uppercase tracking-[0.14em] text-brand-mid">
-        Account
-      </p>
+      <p className="mb-3 text-sm font-semibold uppercase tracking-[0.14em] text-brand-mid">Account</p>
       <h1 className="font-display text-4xl font-semibold text-ink">Your Prosperax account</h1>
 
       <dl className="mt-8 space-y-3 border border-line bg-surface-elevated p-5 text-sm">
@@ -71,6 +88,59 @@ export default function AccountPage() {
           <dd className="font-medium text-ink">{user.role}</dd>
         </div>
       </dl>
+
+      <section className="mt-8 border border-line bg-surface-elevated p-5">
+        <div className="flex items-center justify-between gap-3">
+          <h2 className="font-display text-xl font-semibold text-ink">My help request</h2>
+          {!open ? (
+            <Link href="/requests/new" className="text-sm font-medium text-brand hover:underline">
+              Create
+            </Link>
+          ) : null}
+        </div>
+        {open ? (
+          <div className="mt-4 text-sm">
+            <p className="font-medium text-ink">{open.full_name}</p>
+            <p className="mt-1 capitalize text-ink-muted">{statusLabel(open.status)}</p>
+            <p className="mt-2 text-brand">
+              {formatNgn(open.raised_ngn)} / {formatNgn(open.goal_ngn)}
+            </p>
+            <Link href={`/requests/${open.id}`} className="mt-3 inline-block text-brand hover:underline">
+              View request
+            </Link>
+          </div>
+        ) : (
+          <p className="mt-3 text-sm text-ink-muted">No open request yet.</p>
+        )}
+      </section>
+
+      <section className="mt-8 border border-line bg-surface-elevated p-5">
+        <h2 className="font-display text-xl font-semibold text-ink">My donations</h2>
+        {donations.length === 0 ? (
+          <p className="mt-3 text-sm text-ink-muted">No donations yet.</p>
+        ) : (
+          <ul className="mt-4 space-y-3 text-sm">
+            {donations.map((donation) => (
+              <li key={donation.id} className="border-b border-line pb-3">
+                <p className="font-medium text-ink">
+                  {donation.help_request?.full_name ?? "Help request"}
+                </p>
+                <p className="mt-1 text-ink-muted">
+                  {formatNgn(donation.gross_amount)} · {statusLabel(donation.status)}
+                </p>
+                {donation.help_request ? (
+                  <Link
+                    href={`/requests/${donation.help_request.id}`}
+                    className="mt-1 inline-block text-brand hover:underline"
+                  >
+                    View
+                  </Link>
+                ) : null}
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
 
       <form onSubmit={saveEmail} className="mt-8 space-y-4">
         <label className="block text-sm font-medium text-ink">

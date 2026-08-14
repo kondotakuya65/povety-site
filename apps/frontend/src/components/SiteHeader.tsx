@@ -37,10 +37,16 @@ export default function SiteHeader() {
           Prosperax
         </Link>
         <nav className="flex items-center gap-4 text-sm font-medium">
+          <Link href="/requests" className="text-ink-muted hover:text-brand">
+            Browse
+          </Link>
           {!ready ? (
             <span className="text-ink-muted">…</span>
           ) : user ? (
             <>
+              <Link href="/requests/new" className="text-ink-muted hover:text-brand">
+                Request help
+              </Link>
               <Link href="/account" className="text-ink-muted hover:text-brand">
                 Account
               </Link>
