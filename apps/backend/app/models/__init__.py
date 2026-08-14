@@ -17,6 +17,7 @@ from app.models.enums import (
 )
 from app.models.help_request import HelpRequest
 from app.models.media_asset import MediaAsset
+from app.models.otp_code import OtpCode
 from app.models.payout import Payout, PayoutBatch
 from app.models.refund import Refund
 from app.models.user import User
@@ -31,6 +32,7 @@ __all__ = [
     "MediaAsset",
     "MediaKind",
     "OPEN_HELP_REQUEST_STATUSES",
+    "OtpCode",
     "Payout",
     "PayoutBatch",
     "PayoutBatchStatus",

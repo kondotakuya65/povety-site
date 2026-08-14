@@ -46,14 +46,14 @@ Work top to bottom. Check off each step when done. Do not skip money/webhook ste
 
 ## Phase 2 — Auth (phone OTP + roles)
 
-1. [ ] SMS provider client (Nigeria OTP) + env keys
-2. [ ] `POST /auth/otp/request` — send OTP to phone
-3. [ ] `POST /auth/otp/verify` — issue session/JWT
-4. [ ] Store/update `User` (phone, optional email, role)
-5. [ ] Auth middleware on API; protect admin routes
-6. [ ] Web: login / OTP screens
-7. [ ] Collect email when needed (receipts)
-8. [ ] Admin bootstrap (env `ADMIN_PHONES` or seed)
+1. [x] SMS provider: `console` (dev) + Termii (production) via `SMS_PROVIDER`
+2. [x] `POST /api/auth/otp/request` — send OTP to phone
+3. [x] `POST /api/auth/otp/verify` — issue JWT
+4. [x] Store/update `User` (phone, optional email, role)
+5. [x] Bearer auth; `GET /api/admin/ping` is admin-only
+6. [x] Frontend login / OTP screens (`/login`)
+7. [x] Collect email on `/account` (`PATCH /api/auth/me`)
+8. [x] Admin bootstrap via `ADMIN_PHONE` / `ADMIN_PHONES` + seed
 
 **Exit:** requester/donor can log in; admin can access admin routes.
 
@@ -61,12 +61,12 @@ Work top to bottom. Check off each step when done. Do not skip money/webhook ste
 
 ## Phase 2b — Admin settings API + UI
 
-1. [ ] `GET /settings/public` — fee %, min donation, WhatsApp URL, tagline, maintenance flag
-2. [ ] `GET /admin/settings` — full ops settings (admin only)
-3. [ ] `PATCH /admin/settings` — update keys with validation (e.g. fee 0–20)
-4. [ ] Audit log on every change
-5. [ ] Admin → Settings screen (platform fee first; other knobs listed in plan §1.1)
-6. [ ] Web donate/home read fee + copy from public settings (not hardcoded `0%`)
+1. [x] `GET /api/settings/public` — fee %, min donation, WhatsApp URL, tagline, maintenance flag
+2. [x] `GET /api/admin/settings` — full ops settings (admin only)
+3. [x] `PATCH /api/admin/settings` — update keys with validation (e.g. fee 0–20)
+4. [x] Audit log on every change
+5. [x] Admin → Settings screen (`/admin/settings`)
+6. [x] Home reads fee/tagline/WhatsApp/min donation from public settings
 
 **Exit:** admin can set fee to 0 and change it; UI reflects current value; secrets stay in `.env`.
 
@@ -213,6 +213,8 @@ Work top to bottom. Check off each step when done. Do not skip money/webhook ste
 
 1. ~~Scaffold `apps/frontend` + `apps/backend`~~ (Phase 0)  
 2. ~~Alembic + core tables + settings/admin seed~~ (Phase 1)  
-3. Phase 2: phone OTP auth  
+3. ~~Phone OTP auth~~ (Phase 2)  
+4. ~~Admin settings API + UI~~ (Phase 2b)  
+5. Phase 3: help requests + admin review  
 
 Say when to start Phase 0 in the repo and implementation can begin immediately.
