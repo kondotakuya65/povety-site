@@ -98,12 +98,12 @@ async def create(
     bank_code: str | None = Form(None),
     account_number: str | None = Form(None),
     account_name: str | None = Form(None),
-    photo: UploadFile = File(...),
+    photo: UploadFile | None = File(None),
     user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ) -> dict:
     try:
-        asset = await save_photo(db, user=user, photo=photo)
+        asset = await save_photo(db, user=user, photo=photo) if photo else None
         row = create_help_request(
             db,
             user=user,

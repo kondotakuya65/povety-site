@@ -3,6 +3,8 @@
 import Link from "next/link";
 import { FormEvent, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import PhotoCropUpload from "@/components/PhotoCropUpload";
+import RichTextEditor from "@/components/RichTextEditor";
 import { api, ApiError } from "@/lib/api";
 import { getToken } from "@/lib/auth";
 
@@ -10,6 +12,7 @@ export default function CreateHelpRequestPage() {
   const router = useRouter();
   const [fullName, setFullName] = useState("");
   const [story, setStory] = useState("");
+  const [storyText, setStoryText] = useState("");
   const [goal, setGoal] = useState("");
   const [deadlineDays, setDeadlineDays] = useState("30");
   const [verificationType, setVerificationType] = useState<"nin" | "phone">("phone");
@@ -28,8 +31,8 @@ export default function CreateHelpRequestPage() {
 
   async function onSubmit(e: FormEvent) {
     e.preventDefault();
-    if (!photo) {
-      setError("Please upload a photo");
+    if (storyText.trim().length < 40) {
+      setError("Please share a bit more of your story (at least 40 characters).");
       return;
     }
     setBusy(true);
@@ -46,7 +49,7 @@ export default function CreateHelpRequestPage() {
       form.set("bank_code", bankCode);
       form.set("account_number", accountNumber);
       form.set("account_name", accountName);
-      form.set("photo", photo);
+      if (photo) form.set("photo", photo);
 
       const created = await api<{ id: string }>("/api/help-requests", {
         method: "POST",
@@ -67,48 +70,74 @@ export default function CreateHelpRequestPage() {
       </p>
       <h1 className="font-display text-4xl font-semibold text-ink">Share your need</h1>
       <p className="mt-3 text-ink-muted">
-        One open request at a time. An admin reviews before it goes live.
+        One open request at a time. An admin reviews before it goes live. See{" "}
+        <Link href="/acceptable-use" className="text-brand hover:underline">
+          acceptable use
+        </Link>{" "}
+        and{" "}
+        <Link href="/how-it-works" className="text-brand hover:underline">
+          how it works
+        </Link>
+        .
       </p>
 
-      <form onSubmit={onSubmit} className="mt-8 space-y-5">
-        <label className="block text-sm font-medium text-ink">
-          Full name
-          <input
-            className="mt-2 w-full border border-line bg-surface-elevated px-3 py-2.5 outline-none focus:border-brand"
-            value={fullName}
-            onChange={(e) => setFullName(e.target.value)}
-            required
-          />
-        </label>
+      <form onSubmit={onSubmit} className="mt-10 space-y-8">
+        <section className="space-y-5 rounded-2xl border border-line bg-white p-5 shadow-sm sm:p-6">
+          <div>
+            <p className="text-xs font-bold uppercase tracking-[0.16em] text-brand-mid">Your request</p>
+            <h2 className="font-display mt-1 text-2xl font-semibold text-ink">Tell people who you are</h2>
+          </div>
+          <label className="block text-sm font-medium text-ink">
+            Full name
+            <input
+              className="mt-2 w-full rounded-xl border border-line bg-surface-elevated px-4 py-3 outline-none focus:border-brand focus:ring-2 focus:ring-brand/10"
+              value={fullName}
+              onChange={(e) => setFullName(e.target.value)}
+              autoComplete="name"
+              required
+            />
+          </label>
 
-        <label className="block text-sm font-medium text-ink">
-          Photo
-          <input
-            type="file"
-            accept="image/jpeg,image/png,image/webp"
-            className="mt-2 block w-full text-sm"
-            onChange={(e) => setPhoto(e.target.files?.[0] ?? null)}
-            required
-          />
-        </label>
+          <div>
+            <div className="mb-2 flex items-baseline justify-between gap-3">
+              <label className="text-sm font-medium text-ink">Cover photo</label>
+              <span className="text-xs text-ink-muted">Optional</span>
+            </div>
+            <PhotoCropUpload value={photo} onChange={setPhoto} onError={setError} />
+          </div>
 
-        <label className="block text-sm font-medium text-ink">
-          Story
-          <textarea
-            className="mt-2 min-h-36 w-full border border-line bg-surface-elevated px-3 py-2.5 outline-none focus:border-brand"
-            value={story}
-            onChange={(e) => setStory(e.target.value)}
-            required
-          />
-        </label>
+          <div>
+            <div className="mb-2 flex items-baseline justify-between gap-3">
+              <label className="text-sm font-medium text-ink">Your story</label>
+              <span className={`text-xs ${storyText.length > 5000 ? "text-danger" : "text-ink-muted"}`}>
+                {storyText.length.toLocaleString()} / 5,000
+              </span>
+            </div>
+            <RichTextEditor
+              value={story}
+              onChange={(html, text) => {
+                setStory(html);
+                setStoryText(text);
+              }}
+            />
+            <p className="mt-2 text-xs text-ink-muted">
+              Explain what happened, what the funds are for, and how this help will make a difference.
+            </p>
+          </div>
+        </section>
 
-        <div className="grid gap-4 sm:grid-cols-2">
+        <section className="space-y-5 rounded-2xl border border-line bg-white p-5 shadow-sm sm:p-6">
+          <div>
+            <p className="text-xs font-bold uppercase tracking-[0.16em] text-brand-mid">Goal</p>
+            <h2 className="font-display mt-1 text-2xl font-semibold text-ink">How much help do you need?</h2>
+          </div>
+          <div className="grid gap-4 sm:grid-cols-2">
           <label className="block text-sm font-medium text-ink">
             Goal (NGN)
             <input
               type="number"
               min="1"
-              className="mt-2 w-full border border-line bg-surface-elevated px-3 py-2.5 outline-none focus:border-brand"
+              className="mt-2 w-full rounded-xl border border-line bg-surface-elevated px-4 py-3 outline-none focus:border-brand focus:ring-2 focus:ring-brand/10"
               value={goal}
               onChange={(e) => setGoal(e.target.value)}
               required
@@ -117,7 +146,7 @@ export default function CreateHelpRequestPage() {
           <label className="block text-sm font-medium text-ink">
             Deadline
             <select
-              className="mt-2 w-full border border-line bg-surface-elevated px-3 py-2.5 outline-none focus:border-brand"
+              className="mt-2 w-full rounded-xl border border-line bg-surface-elevated px-4 py-3 outline-none focus:border-brand focus:ring-2 focus:ring-brand/10"
               value={deadlineDays}
               onChange={(e) => setDeadlineDays(e.target.value)}
             >
@@ -126,10 +155,11 @@ export default function CreateHelpRequestPage() {
               <option value="60">60 days</option>
             </select>
           </label>
-        </div>
+          </div>
+        </section>
 
-        <fieldset className="space-y-3">
-          <legend className="text-sm font-medium text-ink">Verification</legend>
+        <fieldset className="space-y-4 rounded-2xl border border-line bg-white p-5 shadow-sm sm:p-6">
+          <legend className="px-2 font-display text-xl font-semibold text-ink">Verification</legend>
           <div className="flex gap-4 text-sm">
             <label className="flex items-center gap-2">
               <input
@@ -150,7 +180,7 @@ export default function CreateHelpRequestPage() {
           </div>
           {verificationType === "nin" ? (
             <input
-              className="w-full border border-line bg-surface-elevated px-3 py-2.5 outline-none focus:border-brand"
+              className="w-full rounded-xl border border-line bg-surface-elevated px-4 py-3 outline-none focus:border-brand"
               placeholder="11-digit NIN"
               value={verificationNin}
               onChange={(e) => setVerificationNin(e.target.value)}
@@ -158,7 +188,7 @@ export default function CreateHelpRequestPage() {
             />
           ) : (
             <input
-              className="w-full border border-line bg-surface-elevated px-3 py-2.5 outline-none focus:border-brand"
+              className="w-full rounded-xl border border-line bg-surface-elevated px-4 py-3 outline-none focus:border-brand"
               placeholder="Phone (defaults to login phone if blank)"
               value={verificationPhone}
               onChange={(e) => setVerificationPhone(e.target.value)}
@@ -166,11 +196,11 @@ export default function CreateHelpRequestPage() {
           )}
         </fieldset>
 
-        <fieldset className="space-y-3 border border-line bg-surface-elevated p-4">
-          <legend className="px-1 text-sm font-semibold text-ink">Payout bank details</legend>
+        <fieldset className="space-y-3 rounded-2xl border border-line bg-white p-5 shadow-sm sm:p-6">
+          <legend className="px-2 font-display text-xl font-semibold text-ink">Payout bank details</legend>
           <p className="text-sm text-ink-muted">Required before admin approval and weekly payout.</p>
           <input
-            className="w-full border border-line px-3 py-2.5 outline-none focus:border-brand"
+            className="w-full rounded-xl border border-line px-4 py-3 outline-none focus:border-brand"
             placeholder="Bank code"
             value={bankCode}
             onChange={(e) => setBankCode(e.target.value)}
@@ -178,14 +208,14 @@ export default function CreateHelpRequestPage() {
           />
           <input
             inputMode="numeric"
-            className="w-full border border-line px-3 py-2.5 outline-none focus:border-brand"
+            className="w-full rounded-xl border border-line px-4 py-3 outline-none focus:border-brand"
             placeholder="Account number"
             value={accountNumber}
             onChange={(e) => setAccountNumber(e.target.value.replace(/\D/g, ""))}
             required
           />
           <input
-            className="w-full border border-line px-3 py-2.5 outline-none focus:border-brand"
+            className="w-full rounded-xl border border-line px-4 py-3 outline-none focus:border-brand"
             placeholder="Account holder name"
             value={accountName}
             onChange={(e) => setAccountName(e.target.value)}
@@ -197,7 +227,7 @@ export default function CreateHelpRequestPage() {
         <button
           type="submit"
           disabled={busy}
-          className="bg-brand px-5 py-3 font-semibold text-white hover:bg-brand-deep disabled:opacity-60"
+          className="w-full rounded-full bg-brand px-5 py-3.5 font-semibold text-white shadow-lg shadow-brand/20 hover:bg-brand-deep disabled:opacity-60 sm:w-auto"
         >
           {busy ? "Submitting…" : "Submit for review"}
         </button>

@@ -5,7 +5,7 @@ import { FormEvent, useCallback, useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { api, ApiError } from "@/lib/api";
 import { getToken } from "@/lib/auth";
-import { HelpRequest, formatNgn, statusLabel } from "@/lib/helpRequests";
+import { HelpRequest, formatNgn, requestPhoto, statusLabel } from "@/lib/helpRequests";
 
 type PublicSettings = {
   platform_fee_percent?: number;
@@ -99,96 +99,106 @@ export default function RequestDetailPage() {
       <Link href="/requests" className="text-sm text-ink-muted hover:text-brand">
         ← Browse
       </Link>
-      <div className="mt-6 overflow-hidden border border-line bg-surface-elevated">
-        {item.photo_url ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src={item.photo_url} alt={item.full_name} className="h-72 w-full object-cover" />
-        ) : null}
-        <div className="p-6">
-          <p className="text-xs font-semibold uppercase tracking-[0.14em] text-brand-mid">
-            {statusLabel(item.status)}
-          </p>
-          <h1 className="font-display mt-2 text-4xl font-semibold text-ink">{item.full_name}</h1>
-          <p className="mt-4 whitespace-pre-wrap text-ink-muted">{item.story}</p>
 
-          <div className="mt-8">
-            <div className="mb-2 flex justify-between text-sm">
-              <span className="font-medium text-brand">{formatNgn(item.raised_ngn)} raised</span>
-              <span className="text-ink-muted">Goal {formatNgn(item.goal_ngn)}</span>
-            </div>
-            <div className="h-2 bg-brand-soft">
-              <div className="h-2 bg-brand" style={{ width: `${progress}%` }} />
-            </div>
+      <div className="mt-6">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={requestPhoto(item.photo_url)}
+          alt={item.full_name}
+          className="aspect-[16/9] w-full object-cover"
+        />
+      </div>
+
+      <div className="mt-8">
+        <p className="text-xs font-semibold uppercase tracking-[0.14em] text-brand-mid">
+          {statusLabel(item.status)}
+        </p>
+        <h1 className="font-display mt-2 text-4xl font-semibold text-ink sm:text-5xl">{item.full_name}</h1>
+        <div
+          className="rich-story mt-6 text-lg leading-relaxed text-ink-muted"
+          dangerouslySetInnerHTML={{ __html: item.story }}
+        />
+
+        <div className="mt-10">
+          <div className="mb-2 flex justify-between text-sm">
+            <span className="font-medium text-brand">{formatNgn(item.raised_ngn)} raised</span>
+            <span className="text-ink-muted">Goal {formatNgn(item.goal_ngn)}</span>
           </div>
-
-          {item.deadline_at ? (
-            <p className="mt-4 text-sm text-ink-muted">
-              Deadline: {new Date(item.deadline_at).toLocaleDateString("en-NG")}
-            </p>
-          ) : (
-            <p className="mt-4 text-sm text-ink-muted">Deadline: {item.deadline_days} days after approval</p>
-          )}
-
-          {item.status === "live" ? (
-            <form onSubmit={donate} className="mt-8 space-y-4 border border-line bg-brand-mist p-4">
-              <h2 className="font-display text-xl font-semibold text-ink">Send help</h2>
-              <p className="text-sm text-ink-muted">
-                Your gift is held securely until the request is approved for payout. Prosperax
-                platform fee: {feePercent}%. Payment processing is handled by Paystack; Paystack’s
-                standard processing fees may apply.
-              </p>
-              <label className="block text-sm font-medium text-ink">
-                Amount (NGN)
-                <input
-                  type="number"
-                  min={minDonation}
-                  className="mt-2 w-full border border-line bg-white px-3 py-2.5 outline-none focus:border-brand"
-                  value={amount}
-                  onChange={(e) => setAmount(e.target.value)}
-                  required
-                />
-              </label>
-              <label className="block text-sm font-medium text-ink">
-                Receipt email (optional if already saved on account)
-                <input
-                  type="email"
-                  className="mt-2 w-full border border-line bg-white px-3 py-2.5 outline-none focus:border-brand"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="you@example.com"
-                />
-              </label>
-              <p className="text-sm text-ink-muted">
-                Toward this request: <strong className="text-ink">{formatNgn(net)}</strong>
-                {feePercent > 0 ? ` (platform fee ${formatNgn(feeAmount)})` : null}
-              </p>
-              {donateError ? <p className="text-sm text-danger">{donateError}</p> : null}
-              <button
-                type="submit"
-                disabled={busy}
-                className="bg-brand px-5 py-3 font-semibold text-white hover:bg-brand-deep disabled:opacity-60"
-              >
-                {busy ? "Redirecting…" : "Donate with Paystack"}
-              </button>
-            </form>
-          ) : null}
-
-          <section className="mt-8">
-            <h2 className="font-display text-xl font-semibold text-ink">Recent supporters</h2>
-            {supporters.length === 0 ? (
-              <p className="mt-2 text-sm text-ink-muted">No gifts yet. Be the first.</p>
-            ) : (
-              <ul className="mt-3 space-y-2 text-sm">
-                {supporters.map((supporter, index) => (
-                  <li key={`${supporter.created_at}-${index}`} className="flex justify-between border-b border-line py-2">
-                    <span className="text-ink-muted">{supporter.label}</span>
-                    <span className="font-medium text-brand">{formatNgn(supporter.net_to_request)}</span>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </section>
+          <div className="h-2 bg-brand-soft">
+            <div className="h-2 bg-brand transition-all" style={{ width: `${progress}%` }} />
+          </div>
         </div>
+
+        {item.deadline_at ? (
+          <p className="mt-4 text-sm text-ink-muted">
+            Deadline: {new Date(item.deadline_at).toLocaleDateString("en-NG")}
+          </p>
+        ) : (
+          <p className="mt-4 text-sm text-ink-muted">Deadline: {item.deadline_days} days after approval</p>
+        )}
+
+        {item.status === "live" ? (
+          <form onSubmit={donate} className="mt-10 space-y-4 border-y border-line bg-brand-mist px-4 py-6 sm:px-6">
+            <h2 className="font-display text-2xl font-semibold text-ink">Send help</h2>
+            <p className="text-sm text-ink-muted">
+              Your gift is held securely until weekly payout when the goal is met. Prosperax platform
+              fee: {feePercent}%. Payment processing is handled by Paystack; Paystack’s standard
+              processing fees may apply.
+            </p>
+            <label className="block text-sm font-medium text-ink">
+              Amount (NGN)
+              <input
+                type="number"
+                min={minDonation}
+                className="mt-2 w-full border border-line bg-white px-3 py-2.5 outline-none focus:border-brand"
+                value={amount}
+                onChange={(e) => setAmount(e.target.value)}
+                required
+              />
+            </label>
+            <label className="block text-sm font-medium text-ink">
+              Receipt email (optional if already saved on account)
+              <input
+                type="email"
+                className="mt-2 w-full border border-line bg-white px-3 py-2.5 outline-none focus:border-brand"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="you@example.com"
+              />
+            </label>
+            <p className="text-sm text-ink-muted">
+              Toward this request: <strong className="text-ink">{formatNgn(net)}</strong>
+              {feePercent > 0 ? ` (platform fee ${formatNgn(feeAmount)})` : null}
+            </p>
+            {donateError ? <p className="text-sm text-danger">{donateError}</p> : null}
+            <button
+              type="submit"
+              disabled={busy}
+              className="bg-brand px-5 py-3 font-semibold text-white hover:bg-brand-deep disabled:opacity-60"
+            >
+              {busy ? "Redirecting…" : "Donate with Paystack"}
+            </button>
+          </form>
+        ) : null}
+
+        <section className="mt-10">
+          <h2 className="font-display text-2xl font-semibold text-ink">Recent supporters</h2>
+          {supporters.length === 0 ? (
+            <p className="mt-2 text-sm text-ink-muted">No gifts yet. Be the first.</p>
+          ) : (
+            <ul className="mt-3 space-y-2 text-sm">
+              {supporters.map((supporter, index) => (
+                <li
+                  key={`${supporter.created_at}-${index}`}
+                  className="flex justify-between border-b border-line py-2"
+                >
+                  <span className="text-ink-muted">{supporter.label}</span>
+                  <span className="font-medium text-brand">{formatNgn(supporter.net_to_request)}</span>
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
       </div>
     </div>
   );

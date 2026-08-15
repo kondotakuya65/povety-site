@@ -7,3 +7,4 @@ alembic>=1.14
 psycopg[binary]>=3.2
 PyJWT>=2.10.0
 python-multipart>=0.0.9
+bleach>=6.4.0

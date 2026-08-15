@@ -133,4 +133,10 @@ Example VPS cron:
 0 2 * * * cd /var/www/prosperax/apps/backend && .venv/bin/python -m app.scripts.money_jobs refunds
 ```
 
-Next: Phase 6 — public UX and policy pages (`docs/implementation-steps.md`).
+Next: Phase 7 — email notices (`docs/implementation-steps.md`).
+
+## Public UX (Phase 6)
+
+- Home: brand hero, pulse stats (`GET /api/stats/public`), Need of the Day, how it works, live teaser, trust
+- Footer + policies: `/about`, `/how-it-works`, `/terms`, `/privacy`, `/refunds`, `/acceptable-use`
+- Polished browse, detail, create, account, and admin nav (mobile menu)

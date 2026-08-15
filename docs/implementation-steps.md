@@ -125,7 +125,7 @@ Work top to bottom. Check off each step when done. Do not skip money/webhook ste
 
 ## Phase 6 — Public UX (Prosperax UI)
 
-1. [ ] Home (Rising Lion–inspired, mobile-first, green):
+1. [x] Home (Rising Lion–inspired, mobile-first, green):
    - brand hero + Send help / Request help
    - WhatsApp follow (from settings `whatsapp_follow_url`)
    - pulse stats
@@ -133,12 +133,12 @@ Work top to bottom. Check off each step when done. Do not skip money/webhook ste
    - how it works (include hold → weekly payout)
    - live request list teaser
    - trust block (0% fee, hold, Paystack)
-2. [ ] Browse live requests
-3. [ ] Request detail + donate
-4. [ ] Create request flow
-5. [ ] User dashboard
-6. [ ] Admin console (review, payouts, refunds, **settings**)
-7. [ ] Policy pages: About, How it works, Terms, Privacy, Refunds, Acceptable use (use plan disallowed list)
+2. [x] Browse live requests
+3. [x] Request detail + donate
+4. [x] Create request flow
+5. [x] User dashboard
+6. [x] Admin console (review, payouts, refunds, **settings**)
+7. [x] Policy pages: About, How it works, Terms, Privacy, Refunds, Acceptable use (use plan disallowed list)
 
 **Exit:** all plan screens usable end-to-end on mobile + desktop.
 

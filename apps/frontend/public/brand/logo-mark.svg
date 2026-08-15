@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none" role="img" aria-label="Prosperax">
+  <defs>
+    <linearGradient id="px-leaf" x1="18" y1="48" x2="46" y2="14" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#7EE2A8"/>
+      <stop offset="0.55" stop-color="#FFFFFF"/>
+      <stop offset="1" stop-color="#E8F8EE"/>
+    </linearGradient>
+    <linearGradient id="px-bg" x1="8" y1="8" x2="56" y2="56" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#1A8F54"/>
+      <stop offset="1" stop-color="#0A4D2C"/>
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="16" fill="url(#px-bg)"/>
+  <!-- rising leaf / growth mark -->
+  <path
+    d="M18 42c10.8 0 19.2-8.4 19.2-19.2 0-.4 0-.8-.1-1.2 8.2 3.1 13.7 11 13 19.5-.8 8.7-8.4 14.7-17.1 13.8C25.4 54.2 19.4 49.1 18 42Z"
+    fill="url(#px-leaf)"
+  />
+  <path
+    d="M20.5 46.5c5.8-11.6 13.9-18.1 24.5-19.6"
+    stroke="#0A4D2C"
+    stroke-width="2.6"
+    stroke-linecap="round"
+  />
+  <!-- warm accent seed -->
+  <circle cx="44.5" cy="22" r="3.2" fill="#C4A35A"/>
+</svg>

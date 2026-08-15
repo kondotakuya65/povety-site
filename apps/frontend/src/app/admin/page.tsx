@@ -5,7 +5,13 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { api, ApiError } from "@/lib/api";
 import { clearSession, getToken } from "@/lib/auth";
-import { HelpRequest, formatNgn, statusLabel } from "@/lib/helpRequests";
+import {
+  HelpRequest,
+  formatNgn,
+  requestPhoto,
+  statusLabel,
+  storyExcerpt,
+} from "@/lib/helpRequests";
 
 type Ping = { ok: boolean; role: string; phone: string };
 
@@ -101,13 +107,17 @@ export default function AdminPage() {
           pending.map((item) => (
             <div key={item.id} className="border border-line bg-surface-elevated p-4">
               <div className="flex flex-wrap gap-4">
-                {item.photo_url ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={item.photo_url} alt={item.full_name} className="h-24 w-24 object-cover" />
-                ) : null}
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={requestPhoto(item.photo_url)}
+                  alt={item.full_name}
+                  className="h-24 w-24 object-cover"
+                />
                 <div className="min-w-0 flex-1">
                   <p className="font-semibold text-ink">{item.full_name}</p>
-                  <p className="mt-1 line-clamp-3 text-sm text-ink-muted">{item.story}</p>
+                  <p className="mt-1 line-clamp-3 text-sm text-ink-muted">
+                    {storyExcerpt(item.story, item.story_plain)}
+                  </p>
                   <p className="mt-2 text-sm text-brand">
                     Goal {formatNgn(item.goal_ngn)} · {statusLabel(item.status)}
                   </p>

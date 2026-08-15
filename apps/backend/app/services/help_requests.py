@@ -2,11 +2,13 @@ from __future__ import annotations
 
 import re
 import uuid
+from html import unescape
 from datetime import datetime, timedelta, timezone
 from decimal import Decimal, InvalidOperation
 from pathlib import Path
 
 from fastapi import UploadFile
+import bleach
 from sqlalchemy import select
 from sqlalchemy.orm import Session, selectinload
 
@@ -28,6 +30,22 @@ from app.services.settings import get_setting_value
 ALLOWED_IMAGE_TYPES = {"image/jpeg", "image/png", "image/webp"}
 MAX_PHOTO_BYTES = 5 * 1024 * 1024
 _NIN_RE = re.compile(r"^\d{11}$")
+_DANGEROUS_HTML_BLOCK_RE = re.compile(
+    r"<(script|style|iframe|object|embed)\b[^>]*>.*?</\1\s*>",
+    flags=re.IGNORECASE | re.DOTALL,
+)
+STORY_TAGS = {
+    "p",
+    "br",
+    "strong",
+    "em",
+    "ul",
+    "ol",
+    "li",
+    "blockquote",
+    "h2",
+    "h3",
+}
 
 
 class HelpRequestError(ValueError):
@@ -41,10 +59,12 @@ def media_url(asset: MediaAsset | None) -> str | None:
 
 
 def serialize_help_request(row: HelpRequest, *, include_private: bool = False) -> dict:
+    safe_story = sanitize_story(row.story)
     data = {
         "id": str(row.id),
         "full_name": row.full_name,
-        "story": row.story,
+        "story": safe_story,
+        "story_plain": story_plain_text(safe_story),
         "goal_ngn": float(row.goal_ngn),
         "raised_ngn": float(row.raised_ngn),
         "deadline_days": row.deadline_days,
@@ -69,6 +89,23 @@ def serialize_help_request(row: HelpRequest, *, include_private: bool = False) -
             }
         )
     return data
+
+
+def sanitize_story(value: str) -> str:
+    """Keep editor formatting while removing scripts, links, and attributes."""
+    without_dangerous_blocks = _DANGEROUS_HTML_BLOCK_RE.sub("", value)
+    return bleach.clean(
+        without_dangerous_blocks.strip(),
+        tags=STORY_TAGS,
+        attributes={},
+        protocols=set(),
+        strip=True,
+    )
+
+
+def story_plain_text(value: str) -> str:
+    plain = bleach.clean(value, tags=set(), attributes={}, strip=True)
+    return re.sub(r"\s+", " ", unescape(plain)).strip()
 
 
 def _default_deadline_days(db: Session) -> int:
@@ -143,17 +180,18 @@ def create_help_request(
     bank_code: str | None,
     account_number: str | None,
     account_name: str | None,
-    photo: MediaAsset,
+    photo: MediaAsset | None,
 ) -> HelpRequest:
     assert_can_create(db, user)
 
     name = full_name.strip()
-    body = story.strip()
+    body = sanitize_story(story)
+    plain_body = story_plain_text(body)
     if len(name) < 2 or len(name) > 200:
         raise HelpRequestError("Full name must be 2–200 characters")
-    if len(body) < 40:
+    if len(plain_body) < 40:
         raise HelpRequestError("Please share a bit more of your story (at least 40 characters)")
-    if len(body) > 5000:
+    if len(plain_body) > 5000:
         raise HelpRequestError("Story is too long")
 
     try:
@@ -197,7 +235,7 @@ def create_help_request(
         verification_type=vtype,
         verification_nin=nin_value,
         verification_phone=phone_value,
-        photo_asset_id=photo.id,
+        photo_asset_id=photo.id if photo else None,
         bank_code=(bank_code or "").strip() or None,
         account_number=(account_number or "").strip() or None,
         account_name=(account_name or "").strip() or None,

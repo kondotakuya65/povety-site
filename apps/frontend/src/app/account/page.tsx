@@ -139,6 +139,9 @@ export default function AccountPage() {
     <div className="mx-auto max-w-lg px-4 py-16 sm:px-6">
       <p className="mb-3 text-sm font-semibold uppercase tracking-[0.14em] text-brand-mid">Account</p>
       <h1 className="font-display text-4xl font-semibold text-ink">Your Prosperax account</h1>
+      <p className="mt-3 text-ink-muted">
+        Manage your request, payout bank details, donation history, and held-gift refunds.
+      </p>
 
       <dl className="mt-8 space-y-3 border border-line bg-surface-elevated p-5 text-sm">
         <div>
