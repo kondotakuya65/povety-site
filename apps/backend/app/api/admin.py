@@ -1,12 +1,24 @@
+from __future__ import annotations
+
 import uuid
+from datetime import datetime, timedelta, timezone
 
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, Field
-from sqlalchemy.orm import Session
+from sqlalchemy import func, select
+from sqlalchemy.orm import Session, selectinload
 
 from app.api.deps import get_current_admin
 from app.core.database import get_db
-from app.models import HelpRequestStatus, User
+from app.models import (
+    AuditLog,
+    Donation,
+    DonationStatus,
+    HelpRequest,
+    HelpRequestStatus,
+    Refund,
+    User,
+)
 from app.services.help_requests import (
     HelpRequestError,
     approve_request,
@@ -44,9 +56,200 @@ class RejectBody(BaseModel):
     reason: str | None = None
 
 
+def _serialize_user(row: User, *, request_count: int = 0, donation_count: int = 0) -> dict:
+    return {
+        "id": str(row.id),
+        "phone": row.phone,
+        "email": row.email,
+        "role": row.role,
+        "created_at": row.created_at.isoformat() if row.created_at else None,
+        "updated_at": row.updated_at.isoformat() if row.updated_at else None,
+        "request_count": request_count,
+        "donation_count": donation_count,
+    }
+
+
+def _serialize_donation(row: Donation) -> dict:
+    return {
+        "id": str(row.id),
+        "status": row.status,
+        "gross_amount": float(row.gross_amount),
+        "net_to_request": float(row.net_to_request),
+        "platform_fee_amount": float(row.platform_fee_amount),
+        "fee_percent_snapshot": float(row.fee_percent_snapshot),
+        "paystack_reference": row.paystack_reference,
+        "created_at": row.created_at.isoformat() if row.created_at else None,
+        "help_request": {
+            "id": str(row.help_request.id),
+            "full_name": row.help_request.full_name,
+            "status": row.help_request.status,
+        }
+        if row.help_request
+        else None,
+        "donor": {
+            "id": str(row.donor.id),
+            "phone": row.donor.phone,
+            "email": row.donor.email,
+        }
+        if row.donor
+        else None,
+    }
+
+
 @router.get("/ping")
 def admin_ping(admin: User = Depends(get_current_admin)) -> dict:
     return {"ok": True, "role": admin.role, "phone": admin.phone}
+
+
+@router.get("/overview")
+def admin_overview(
+    admin: User = Depends(get_current_admin),
+    db: Session = Depends(get_db),
+) -> dict:
+    _ = admin
+    now = datetime.now(timezone.utc)
+    week_ago = now - timedelta(days=7)
+
+    def count_requests(*statuses: str) -> int:
+        return int(
+            db.scalar(
+                select(func.count()).select_from(HelpRequest).where(HelpRequest.status.in_(statuses))
+            )
+            or 0
+        )
+
+    pending = count_requests(HelpRequestStatus.PENDING_REVIEW.value)
+    live = count_requests(HelpRequestStatus.LIVE.value)
+    funded = count_requests(HelpRequestStatus.FUNDED.value)
+    users = int(db.scalar(select(func.count()).select_from(User)) or 0)
+    donations_held = int(
+        db.scalar(
+            select(func.count())
+            .select_from(Donation)
+            .where(Donation.status == DonationStatus.HELD.value)
+        )
+        or 0
+    )
+    held_total = float(
+        db.scalar(
+            select(func.coalesce(func.sum(Donation.net_to_request), 0)).where(
+                Donation.status == DonationStatus.HELD.value
+            )
+        )
+        or 0
+    )
+    gifted_week = float(
+        db.scalar(
+            select(func.coalesce(func.sum(Donation.net_to_request), 0)).where(
+                Donation.status.in_(
+                    [DonationStatus.HELD.value, DonationStatus.PAID_OUT.value]
+                ),
+                Donation.created_at >= week_ago,
+            )
+        )
+        or 0
+    )
+    open_refunds = int(
+        db.scalar(
+            select(func.count()).select_from(Refund).where(Refund.status.in_(["pending", "failed"]))
+        )
+        or 0
+    )
+
+    recent_requests = list(
+        db.scalars(
+            select(HelpRequest)
+            .options(selectinload(HelpRequest.photo))
+            .order_by(HelpRequest.created_at.desc())
+            .limit(6)
+        ).all()
+    )
+    recent_audit = list(
+        db.scalars(select(AuditLog).order_by(AuditLog.created_at.desc()).limit(8)).all()
+    )
+
+    return {
+        "stats": {
+            "users": users,
+            "pending_requests": pending,
+            "live_requests": live,
+            "funded_requests": funded,
+            "held_donations": donations_held,
+            "held_total_ngn": held_total,
+            "gifted_last_7_days_ngn": gifted_week,
+            "open_refunds": open_refunds,
+        },
+        "recent_requests": [
+            serialize_help_request(row, include_private=True) for row in recent_requests
+        ],
+        "recent_audit": [
+            {
+                "id": str(row.id),
+                "action": row.action,
+                "entity_type": row.entity_type,
+                "entity_id": row.entity_id,
+                "created_at": row.created_at.isoformat() if row.created_at else None,
+            }
+            for row in recent_audit
+        ],
+    }
+
+
+@router.get("/users")
+def admin_list_users(
+    q: str | None = None,
+    admin: User = Depends(get_current_admin),
+    db: Session = Depends(get_db),
+) -> dict:
+    _ = admin
+    stmt = select(User).order_by(User.created_at.desc())
+    if q:
+        like = f"%{q.strip()}%"
+        stmt = stmt.where((User.phone.ilike(like)) | (User.email.ilike(like)))
+    users = list(db.scalars(stmt.limit(200)).all())
+
+    request_counts = dict(
+        db.execute(select(HelpRequest.user_id, func.count()).group_by(HelpRequest.user_id)).all()
+    )
+    donation_counts = dict(
+        db.execute(
+            select(Donation.donor_user_id, func.count())
+            .where(Donation.donor_user_id.is_not(None))
+            .group_by(Donation.donor_user_id)
+        ).all()
+    )
+
+    return {
+        "items": [
+            _serialize_user(
+                user,
+                request_count=int(request_counts.get(user.id, 0)),
+                donation_count=int(donation_counts.get(user.id, 0)),
+            )
+            for user in users
+        ]
+    }
+
+
+@router.get("/donations")
+def admin_list_donations(
+    status: str | None = None,
+    admin: User = Depends(get_current_admin),
+    db: Session = Depends(get_db),
+) -> dict:
+    _ = admin
+    if status and status not in {item.value for item in DonationStatus}:
+        raise HTTPException(status_code=400, detail="Invalid donation status")
+    stmt = (
+        select(Donation)
+        .options(selectinload(Donation.help_request), selectinload(Donation.donor))
+        .order_by(Donation.created_at.desc())
+        .limit(200)
+    )
+    if status:
+        stmt = stmt.where(Donation.status == status)
+    rows = list(db.scalars(stmt).all())
+    return {"items": [_serialize_donation(row) for row in rows]}
 
 
 @router.get("/help-requests")

@@ -79,17 +79,9 @@ export default function SiteHeader() {
             Account
           </Link>
           {isAdmin(user) ? (
-            <>
-              <Link href="/admin" className={linkClass} onClick={() => setOpen(false)}>
-                Admin
-              </Link>
-              <Link href="/admin/money" className={linkClass} onClick={() => setOpen(false)}>
-                Money
-              </Link>
-              <Link href="/admin/settings" className={linkClass} onClick={() => setOpen(false)}>
-                Settings
-              </Link>
-            </>
+            <Link href="/admin" className={linkClass} onClick={() => setOpen(false)}>
+              Admin
+            </Link>
           ) : null}
           <button type="button" onClick={logout} className="text-left text-brand hover:text-brand-deep">
             Log out

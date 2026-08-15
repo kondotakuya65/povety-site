@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { api, ApiError } from "@/lib/api";
@@ -119,29 +118,24 @@ export default function AdminSettingsPage() {
   }
 
   if (!loaded && !error) {
-    return <div className="mx-auto max-w-2xl px-4 py-16 text-ink-muted sm:px-6">Loading settings…</div>;
+    return <div className="text-ink-muted">Loading settings…</div>;
   }
 
   return (
-    <div className="mx-auto max-w-2xl px-4 py-16 sm:px-6">
-      <div className="mb-6 flex items-center justify-between gap-4">
-        <div>
-          <p className="mb-2 text-sm font-semibold uppercase tracking-[0.14em] text-brand-mid">Admin</p>
-          <h1 className="font-display text-4xl font-semibold text-ink">Settings</h1>
-        </div>
-        <Link href="/admin" className="text-sm font-medium text-ink-muted hover:text-brand">
-          ← Console
-        </Link>
+    <div className="mx-auto max-w-2xl space-y-6">
+      <div>
+        <p className="text-xs font-bold uppercase tracking-[0.16em] text-brand-mid">Ops</p>
+        <h1 className="font-display mt-1 text-3xl font-semibold text-ink">Settings</h1>
+        <p className="mt-2 text-ink-muted">
+          Operational knobs only. Secrets (Paystack, SMS, JWT) stay in server <code>.env</code>.
+        </p>
       </div>
-      <p className="text-ink-muted">
-        Operational knobs only. Secrets (Paystack, SMS, JWT) stay in server <code>.env</code>.
-      </p>
 
-      {error ? <p className="mt-6 text-sm text-danger">{error}</p> : null}
+      {error ? <p className="text-sm text-danger">{error}</p> : null}
 
-      <form onSubmit={onSubmit} className="mt-8 space-y-6">
+      <form onSubmit={onSubmit} className="space-y-4">
         {ordered.map((item) => (
-          <label key={item.key} className="block border border-line bg-surface-elevated p-4">
+          <label key={item.key} className="block rounded-2xl border border-line bg-white p-4 shadow-sm">
             <span className="block text-sm font-semibold text-ink">{item.label}</span>
             <span className="mt-1 block text-sm text-ink-muted">{item.description}</span>
             {item.value_type === "boolean" ? (
@@ -153,7 +147,7 @@ export default function AdminSettingsPage() {
               />
             ) : item.key === "payout_weekday" ? (
               <select
-                className="mt-3 w-full border border-line bg-white px-3 py-2.5 outline-none focus:border-brand"
+                className="mt-3 w-full rounded-xl border border-line bg-white px-3 py-2.5 outline-none focus:border-brand"
                 value={String(draft[item.key] ?? "1")}
                 onChange={(e) => setDraft((prev) => ({ ...prev, [item.key]: e.target.value }))}
               >
@@ -165,7 +159,7 @@ export default function AdminSettingsPage() {
               </select>
             ) : item.key === "default_deadline_days" ? (
               <select
-                className="mt-3 w-full border border-line bg-white px-3 py-2.5 outline-none focus:border-brand"
+                className="mt-3 w-full rounded-xl border border-line bg-white px-3 py-2.5 outline-none focus:border-brand"
                 value={String(draft[item.key] ?? "30")}
                 onChange={(e) => setDraft((prev) => ({ ...prev, [item.key]: e.target.value }))}
               >
@@ -175,7 +169,7 @@ export default function AdminSettingsPage() {
               </select>
             ) : (
               <input
-                className="mt-3 w-full border border-line bg-white px-3 py-2.5 outline-none focus:border-brand"
+                className="mt-3 w-full rounded-xl border border-line bg-white px-3 py-2.5 outline-none focus:border-brand"
                 type={item.value_type === "number" ? "number" : "text"}
                 step={item.key === "platform_fee_percent" ? "0.01" : undefined}
                 value={String(draft[item.key] ?? "")}
@@ -189,7 +183,7 @@ export default function AdminSettingsPage() {
         <button
           type="submit"
           disabled={busy || Boolean(error && !loaded)}
-          className="bg-brand px-5 py-3 font-semibold text-white hover:bg-brand-deep disabled:opacity-60"
+          className="rounded-full bg-brand px-5 py-3 font-semibold text-white hover:bg-brand-deep disabled:opacity-60"
         >
           {busy ? "Saving…" : "Save settings"}
         </button>

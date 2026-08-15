@@ -137,6 +137,14 @@ Next: Phase 7 — email notices (`docs/implementation-steps.md`).
 
 ## Public UX (Phase 6)
 
-- Home: brand hero, pulse stats (`GET /api/stats/public`), Need of the Day, how it works, live teaser, trust
+- Home: brand hero slider, pulse stats (`GET /api/stats/public`), Need of the Day, how it works, live teaser, trust
 - Footer + policies: `/about`, `/how-it-works`, `/terms`, `/privacy`, `/refunds`, `/acceptable-use`
-- Polished browse, detail, create, account, and admin nav (mobile menu)
+- Polished browse, detail, create (rich text + photo crop), account
+
+## Admin console
+
+Separate left-sidebar area at `/admin` (no public header/footer):
+
+- Overview · Requests · Users · Donations · Payouts & refunds · Settings
+- APIs: `/api/admin/overview`, `/users`, `/donations`, plus existing review/money/settings endpoints
+- Admin role still comes from `ADMIN_PHONE` / `ADMIN_PHONES` in `.env`
