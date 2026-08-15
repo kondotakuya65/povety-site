@@ -258,9 +258,48 @@ def list_admin_requests(db: Session, *, status: str | None = None, limit: int = 
     return list(db.scalars(stmt.limit(limit)).all())
 
 
+def update_bank_details(
+    db: Session,
+    *,
+    row: HelpRequest,
+    user: User,
+    bank_code: str,
+    account_number: str,
+    account_name: str,
+) -> HelpRequest:
+    if row.user_id != user.id:
+        raise HelpRequestError("Help request not found")
+    bank = bank_code.strip()
+    number = account_number.strip()
+    name = account_name.strip()
+    if not bank or len(bank) > 16:
+        raise HelpRequestError("Enter a valid bank code")
+    if not number.isdigit() or not 10 <= len(number) <= 16:
+        raise HelpRequestError("Enter a valid account number")
+    if len(name) < 2 or len(name) > 200:
+        raise HelpRequestError("Enter the account holder name")
+
+    row.bank_code = bank
+    row.account_number = number
+    row.account_name = name
+    db.add(
+        AuditLog(
+            actor_user_id=user.id,
+            action="help_request_bank_update",
+            entity_type="help_request",
+            entity_id=str(row.id),
+            payload={"bank_code": bank, "account_name": name},
+        )
+    )
+    db.commit()
+    return get_help_request(db, row.id)  # type: ignore[return-value]
+
+
 def approve_request(db: Session, *, row: HelpRequest, admin: User) -> HelpRequest:
     if row.status != HelpRequestStatus.PENDING_REVIEW.value:
         raise HelpRequestError("Only pending requests can be approved")
+    if not row.bank_code or not row.account_number or not row.account_name:
+        raise HelpRequestError("Requester must add payout bank details before approval")
 
     now = datetime.now(timezone.utc)
     row.status = HelpRequestStatus.LIVE.value

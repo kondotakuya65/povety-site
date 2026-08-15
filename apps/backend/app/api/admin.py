@@ -15,6 +15,16 @@ from app.services.help_requests import (
     reject_request,
     serialize_help_request,
 )
+from app.services.money_operations import (
+    MoneyOperationError,
+    list_payout_batches,
+    list_refunds,
+    retry_refund,
+    run_weekly_payouts,
+    serialize_batch,
+    serialize_refund,
+    sweep_expired_requests,
+)
 from app.services.settings import (
     SETTING_META,
     WEEKDAY_LABELS,
@@ -83,6 +93,49 @@ def admin_reject_help_request(
     except HelpRequestError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
     return serialize_help_request(updated, include_private=True)
+
+
+@router.get("/money-operations")
+def admin_money_operations(
+    admin: User = Depends(get_current_admin),
+    db: Session = Depends(get_db),
+) -> dict:
+    _ = admin
+    return {
+        "payout_batches": [serialize_batch(row) for row in list_payout_batches(db)],
+        "refunds": [serialize_refund(row) for row in list_refunds(db)],
+    }
+
+
+@router.post("/payouts/run")
+def admin_run_payouts(
+    admin: User = Depends(get_current_admin),
+    db: Session = Depends(get_db),
+) -> dict:
+    batch = run_weekly_payouts(db, admin=admin)
+    return {"batch": serialize_batch(batch)}
+
+
+@router.post("/refunds/sweep-deadlines")
+def admin_sweep_deadlines(
+    admin: User = Depends(get_current_admin),
+    db: Session = Depends(get_db),
+) -> dict:
+    return sweep_expired_requests(db, actor=admin)
+
+
+@router.post("/refunds/{refund_id}/retry")
+def admin_retry_refund(
+    refund_id: uuid.UUID,
+    admin: User = Depends(get_current_admin),
+    db: Session = Depends(get_db),
+) -> dict:
+    _ = admin
+    try:
+        refund = retry_refund(db, refund_id)
+    except MoneyOperationError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    return {"refund": serialize_refund(refund)}
 
 
 @router.get("/settings")

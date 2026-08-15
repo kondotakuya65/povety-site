@@ -3,6 +3,7 @@ from __future__ import annotations
 import uuid
 
 from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile, status
+from pydantic import BaseModel, Field
 from sqlalchemy.orm import Session
 
 from app.api.deps import get_current_user, get_current_user_optional
@@ -16,9 +17,16 @@ from app.services.help_requests import (
     list_mine,
     save_photo,
     serialize_help_request,
+    update_bank_details,
 )
 
 router = APIRouter(prefix="/help-requests", tags=["help-requests"])
+
+
+class BankDetailsBody(BaseModel):
+    bank_code: str = Field(min_length=1, max_length=16)
+    account_number: str = Field(min_length=10, max_length=16)
+    account_name: str = Field(min_length=2, max_length=200)
 
 
 @router.get("")
@@ -31,6 +39,30 @@ def public_list(db: Session = Depends(get_db)) -> dict:
 def my_requests(user: User = Depends(get_current_user), db: Session = Depends(get_db)) -> dict:
     rows = list_mine(db, user)
     return {"items": [serialize_help_request(row, include_private=True) for row in rows]}
+
+
+@router.patch("/{request_id}/bank-details")
+def update_my_bank_details(
+    request_id: uuid.UUID,
+    body: BankDetailsBody,
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> dict:
+    row = get_help_request(db, request_id)
+    if row is None or row.user_id != user.id:
+        raise HTTPException(status_code=404, detail="Help request not found")
+    try:
+        updated = update_bank_details(
+            db,
+            row=row,
+            user=user,
+            bank_code=body.bank_code,
+            account_number=body.account_number,
+            account_name=body.account_name,
+        )
+    except HelpRequestError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    return serialize_help_request(updated, include_private=True)
 
 
 @router.get("/{request_id}")

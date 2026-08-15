@@ -108,16 +108,16 @@ Work top to bottom. Check off each step when done. Do not skip money/webhook ste
 
 ## Phase 5 — Weekly payouts + refunds
 
-1. [ ] Recipient bank details on approved request (account name/number/bank code) for Transfers
-2. [ ] Admin “Run weekly payout” (and/or cron):
+1. [x] Recipient bank details required before approval (account name/number/bank code)
+2. [x] Admin “Run weekly payout” + cron command:
    - select eligible `held` donations
    - Paystack Transfer
    - mark `paid_out`; write `Payout` / `PayoutBatch`
-3. [ ] When raised ≥ goal → mark request `funded` → private after payout rules as planned
-4. [ ] Deadline job: if `live` and past `deadline_at` and raised < goal → queue refunds → `closed_refunded`
-5. [ ] Donor refund API: only if `held` and within 7 days
-6. [ ] Paystack Refund API integration; idempotent refund records
-7. [ ] Admin UI: payout history, refund queue, failures/retry
+3. [x] When raised ≥ goal → mark request `funded` → private; payout only funded requests
+4. [x] Deadline sweep after configured business-day delay → refund held gifts → `closed_refunded`
+5. [x] Donor refund API: only `held`, within configured window (default 7 days)
+6. [x] Paystack Refund API integration; one refund row per donation; retries are idempotent
+7. [x] Admin UI (`/admin/money`): payout history, refund list, failed-refund retry
 
 **Exit:** hold → weekly transfer and unmet-goal/donor refunds work in Paystack test mode.
 
@@ -216,6 +216,7 @@ Work top to bottom. Check off each step when done. Do not skip money/webhook ste
 4. ~~Admin settings API + UI~~ (Phase 2b)  
 5. ~~Help requests + admin review~~ (Phase 3)  
 6. ~~Paystack donate + hold ledger~~ (Phase 4)  
-7. Phase 5: weekly payouts + refunds  
+7. ~~Weekly payouts + refunds~~ (Phase 5)  
+8. Phase 6: public UX and policy pages
 
-Say when to start Phase 0 in the repo and implementation can begin immediately.
+Next implementation step: Phase 6.

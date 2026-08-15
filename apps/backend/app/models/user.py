@@ -33,4 +33,5 @@ class User(Base):
     help_requests: Mapped[list[HelpRequest]] = relationship(
         back_populates="user",
         foreign_keys="HelpRequest.user_id",
+        passive_deletes=True,
     )

@@ -87,6 +87,78 @@ def verify_transaction(reference: str) -> dict[str, Any]:
     return body["data"]
 
 
+def create_transfer_recipient(
+    *,
+    name: str,
+    account_number: str,
+    bank_code: str,
+) -> dict[str, Any]:
+    if settings.paystack_is_mock:
+        return {"recipient_code": f"RCP_mock_{account_number[-4:]}"}
+    body = _request(
+        "POST",
+        "/transferrecipient",
+        {
+            "type": "nuban",
+            "name": name,
+            "account_number": account_number,
+            "bank_code": bank_code,
+            "currency": "NGN",
+        },
+    )
+    return body["data"]
+
+
+def initiate_transfer(
+    *,
+    amount_kobo: int,
+    recipient_code: str,
+    reference: str,
+    reason: str,
+) -> dict[str, Any]:
+    if settings.paystack_is_mock:
+        return {
+            "status": "success",
+            "transfer_code": f"TRF_mock_{reference[-8:]}",
+            "reference": reference,
+        }
+    body = _request(
+        "POST",
+        "/transfer",
+        {
+            "source": "balance",
+            "amount": amount_kobo,
+            "recipient": recipient_code,
+            "reference": reference,
+            "reason": reason,
+        },
+    )
+    return body["data"]
+
+
+def create_refund(
+    *,
+    transaction_reference: str,
+    amount_kobo: int,
+) -> dict[str, Any]:
+    if settings.paystack_is_mock:
+        return {
+            "status": "processed",
+            "id": f"REF_mock_{transaction_reference[-8:]}",
+            "transaction": transaction_reference,
+        }
+    body = _request(
+        "POST",
+        "/refund",
+        {
+            "transaction": transaction_reference,
+            "amount": amount_kobo,
+            "currency": "NGN",
+        },
+    )
+    return body["data"]
+
+
 def verify_webhook_signature(raw_body: bytes, signature: str | None) -> bool:
     if settings.paystack_is_mock:
         return True

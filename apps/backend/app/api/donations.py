@@ -19,6 +19,13 @@ from app.services.donations import (
     serialize_supporter,
 )
 from app.services.paystack import verify_webhook_signature
+from app.services.money_operations import (
+    MoneyOperationError,
+    request_donor_refund,
+    serialize_refund,
+    update_refund_from_webhook,
+    update_transfer_from_webhook,
+)
 
 router = APIRouter(tags=["donations"])
 
@@ -85,6 +92,19 @@ def donations_mine(user: User = Depends(get_current_user), db: Session = Depends
     return {"items": items}
 
 
+@router.post("/donations/{donation_id}/refund")
+def donor_refund(
+    donation_id: uuid.UUID,
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> dict:
+    try:
+        refund = request_donor_refund(db, donation_id=donation_id, user=user)
+    except MoneyOperationError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    return {"refund": serialize_refund(refund)}
+
+
 @router.get("/help-requests/{request_id}/supporters")
 def request_supporters(request_id: uuid.UUID, db: Session = Depends(get_db)) -> dict:
     rows = list_supporters(db, request_id)
@@ -104,6 +124,36 @@ async def paystack_webhook(request: Request, db: Session = Depends(get_db)) -> d
     event = payload.get("event")
     data = payload.get("data") or {}
     reference = data.get("reference")
+    if event in {"transfer.success", "transfer.failed", "transfer.reversed"} and reference:
+        update_transfer_from_webhook(
+            db,
+            reference=reference,
+            successful=event == "transfer.success",
+            transfer_code=data.get("transfer_code"),
+            failure_reason=data.get("reason") or data.get("gateway_response"),
+        )
+        return {"ok": True}
+
+    if event in {"refund.processed", "refund.failed"}:
+        transaction = data.get("transaction") or {}
+        transaction_reference = (
+            transaction.get("reference")
+            if isinstance(transaction, dict)
+            else data.get("transaction_reference")
+        )
+        transaction_reference = transaction_reference or data.get(
+            "transaction_reference"
+        )
+        if transaction_reference:
+            update_refund_from_webhook(
+                db,
+                transaction_reference=str(transaction_reference),
+                successful=event == "refund.processed",
+                refund_reference=str(data.get("id") or data.get("reference") or ""),
+                failure_reason=data.get("message") or data.get("reason"),
+            )
+        return {"ok": True}
+
     if event != "charge.success" or not reference:
         return {"ok": True, "ignored": True}
 

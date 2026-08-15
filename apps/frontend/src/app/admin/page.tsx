@@ -79,6 +79,9 @@ export default function AdminPage() {
       <p className="mt-3 text-ink-muted">Approve or reject pending help requests.</p>
 
       <div className="mt-6 flex flex-wrap gap-3">
+        <Link href="/admin/money" className="bg-brand px-4 py-2 font-semibold text-white hover:bg-brand-deep">
+          Payouts & refunds
+        </Link>
         <Link href="/admin/settings" className="border border-brand px-4 py-2 font-semibold text-brand hover:bg-brand-soft">
           Settings
         </Link>

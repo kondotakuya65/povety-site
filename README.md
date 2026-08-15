@@ -110,4 +110,27 @@ PAYSTACK_PUBLIC_KEY=pk_test_...
 - Webhook: `POST /api/webhooks/paystack`
 - Account shows donation history
 
-Next: Phase 5 — weekly payouts + refunds (`docs/implementation-steps.md`).
+## Payouts & refunds (Phase 5)
+
+- Requesters provide bank code, account number, and account name before approval.
+- Only fully funded requests are eligible for the weekly payout run.
+- Admin operations: http://localhost:3000/admin/money
+- Donors can request a refund from `/account` while the gift is still held and inside the configured window.
+- Expired unmet requests refund held donations after the configured business-day delay.
+
+Manual/cron commands:
+
+```bash
+cd apps/backend
+python -m app.scripts.money_jobs payouts   # weekly
+python -m app.scripts.money_jobs refunds   # daily
+```
+
+Example VPS cron:
+
+```cron
+0 9 * * 1 cd /var/www/prosperax/apps/backend && .venv/bin/python -m app.scripts.money_jobs payouts
+0 2 * * * cd /var/www/prosperax/apps/backend && .venv/bin/python -m app.scripts.money_jobs refunds
+```
+
+Next: Phase 6 — public UX and policy pages (`docs/implementation-steps.md`).

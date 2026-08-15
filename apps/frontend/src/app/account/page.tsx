@@ -22,6 +22,9 @@ export default function AccountPage() {
   const [mine, setMine] = useState<HelpRequest[]>([]);
   const [donations, setDonations] = useState<MyDonation[]>([]);
   const [email, setEmail] = useState("");
+  const [bankCode, setBankCode] = useState("");
+  const [accountNumber, setAccountNumber] = useState("");
+  const [accountName, setAccountName] = useState("");
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
@@ -41,6 +44,12 @@ export default function AccountPage() {
         setEmail(me.email ?? "");
         setMine(requests.items);
         setDonations(giftHistory.items);
+        const request = requests.items.find((item) =>
+          ["draft", "pending_review", "live", "funded"].includes(item.status),
+        );
+        setBankCode(request?.bank_code ?? "");
+        setAccountNumber(request?.account_number ?? "");
+        setAccountName(request?.account_name ?? "");
       })
       .catch(() => {
         clearSession();
@@ -67,11 +76,64 @@ export default function AccountPage() {
     }
   }
 
+  async function saveBank(e: FormEvent) {
+    e.preventDefault();
+    const target = mine.find((item) =>
+      ["draft", "pending_review", "live", "funded"].includes(item.status),
+    );
+    if (!target) return;
+    setError(null);
+    setMessage(null);
+    setBusy(true);
+    try {
+      const updated = await api<HelpRequest>(`/api/help-requests/${target.id}/bank-details`, {
+        method: "PATCH",
+        body: JSON.stringify({
+          bank_code: bankCode,
+          account_number: accountNumber,
+          account_name: accountName,
+        }),
+      });
+      setMine((items) => items.map((item) => (item.id === updated.id ? updated : item)));
+      setMessage("Payout bank details saved.");
+    } catch (err) {
+      setError(err instanceof ApiError ? err.message : "Could not save bank details");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function requestRefund(donationId: string) {
+    if (!window.confirm("Request a refund for this held donation?")) return;
+    setError(null);
+    setMessage(null);
+    setBusy(true);
+    try {
+      const res = await api<{ refund: { status: string } }>(
+        `/api/donations/${donationId}/refund`,
+        { method: "POST" },
+      );
+      setDonations((items) =>
+        items.map((item) =>
+          item.id === donationId && res.refund.status === "success"
+            ? { ...item, status: "refunded" }
+            : item,
+        ),
+      );
+      setMessage(`Refund status: ${res.refund.status}.`);
+    } catch (err) {
+      setError(err instanceof ApiError ? err.message : "Could not request refund");
+    } finally {
+      setBusy(false);
+    }
+  }
+
   if (!user) {
     return <div className="mx-auto max-w-lg px-4 py-16 text-ink-muted sm:px-6">Loading…</div>;
   }
 
   const open = mine.find((item) => ["draft", "pending_review", "live"].includes(item.status));
+  const payoutRequest = open ?? mine.find((item) => item.status === "funded");
 
   return (
     <div className="mx-auto max-w-lg px-4 py-16 sm:px-6">
@@ -114,6 +176,50 @@ export default function AccountPage() {
         )}
       </section>
 
+      {payoutRequest ? (
+        <form onSubmit={saveBank} className="mt-8 space-y-4 border border-line bg-surface-elevated p-5">
+          <div>
+            <h2 className="font-display text-xl font-semibold text-ink">Payout bank details</h2>
+            <p className="mt-1 text-sm text-ink-muted">Required before a funded request can be paid.</p>
+          </div>
+          <label className="block text-sm font-medium text-ink">
+            Bank code
+            <input
+              className="mt-2 w-full border border-line px-3 py-2.5 outline-none focus:border-brand"
+              value={bankCode}
+              onChange={(e) => setBankCode(e.target.value)}
+              required
+            />
+          </label>
+          <label className="block text-sm font-medium text-ink">
+            Account number
+            <input
+              inputMode="numeric"
+              className="mt-2 w-full border border-line px-3 py-2.5 outline-none focus:border-brand"
+              value={accountNumber}
+              onChange={(e) => setAccountNumber(e.target.value.replace(/\D/g, ""))}
+              required
+            />
+          </label>
+          <label className="block text-sm font-medium text-ink">
+            Account name
+            <input
+              className="mt-2 w-full border border-line px-3 py-2.5 outline-none focus:border-brand"
+              value={accountName}
+              onChange={(e) => setAccountName(e.target.value)}
+              required
+            />
+          </label>
+          <button
+            type="submit"
+            disabled={busy}
+            className="bg-brand px-4 py-2.5 font-semibold text-white disabled:opacity-60"
+          >
+            Save payout details
+          </button>
+        </form>
+      ) : null}
+
       <section className="mt-8 border border-line bg-surface-elevated p-5">
         <h2 className="font-display text-xl font-semibold text-ink">My donations</h2>
         {donations.length === 0 ? (
@@ -135,6 +241,16 @@ export default function AccountPage() {
                   >
                     View
                   </Link>
+                ) : null}
+                {donation.status === "held" ? (
+                  <button
+                    type="button"
+                    disabled={busy}
+                    onClick={() => requestRefund(donation.id)}
+                    className="ml-3 text-danger hover:underline disabled:opacity-60"
+                  >
+                    Request refund
+                  </button>
                 ) : null}
               </li>
             ))}

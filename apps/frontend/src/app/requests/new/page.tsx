@@ -15,6 +15,9 @@ export default function CreateHelpRequestPage() {
   const [verificationType, setVerificationType] = useState<"nin" | "phone">("phone");
   const [verificationNin, setVerificationNin] = useState("");
   const [verificationPhone, setVerificationPhone] = useState("");
+  const [bankCode, setBankCode] = useState("");
+  const [accountNumber, setAccountNumber] = useState("");
+  const [accountName, setAccountName] = useState("");
   const [photo, setPhoto] = useState<File | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
@@ -40,6 +43,9 @@ export default function CreateHelpRequestPage() {
       form.set("verification_type", verificationType);
       if (verificationType === "nin") form.set("verification_nin", verificationNin);
       else form.set("verification_phone", verificationPhone);
+      form.set("bank_code", bankCode);
+      form.set("account_number", accountNumber);
+      form.set("account_name", accountName);
       form.set("photo", photo);
 
       const created = await api<{ id: string }>("/api/help-requests", {
@@ -158,6 +164,33 @@ export default function CreateHelpRequestPage() {
               onChange={(e) => setVerificationPhone(e.target.value)}
             />
           )}
+        </fieldset>
+
+        <fieldset className="space-y-3 border border-line bg-surface-elevated p-4">
+          <legend className="px-1 text-sm font-semibold text-ink">Payout bank details</legend>
+          <p className="text-sm text-ink-muted">Required before admin approval and weekly payout.</p>
+          <input
+            className="w-full border border-line px-3 py-2.5 outline-none focus:border-brand"
+            placeholder="Bank code"
+            value={bankCode}
+            onChange={(e) => setBankCode(e.target.value)}
+            required
+          />
+          <input
+            inputMode="numeric"
+            className="w-full border border-line px-3 py-2.5 outline-none focus:border-brand"
+            placeholder="Account number"
+            value={accountNumber}
+            onChange={(e) => setAccountNumber(e.target.value.replace(/\D/g, ""))}
+            required
+          />
+          <input
+            className="w-full border border-line px-3 py-2.5 outline-none focus:border-brand"
+            placeholder="Account holder name"
+            value={accountName}
+            onChange={(e) => setAccountName(e.target.value)}
+            required
+          />
         </fieldset>
 
         {error ? <p className="text-sm text-danger">{error}</p> : null}
