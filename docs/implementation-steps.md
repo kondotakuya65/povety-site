@@ -156,6 +156,8 @@ Work top to bottom. Check off each step when done. Do not skip money/webhook ste
 
 ## Phase 8 — VPS deploy (Nginx + PM2)
 
+Full walkthrough: **[`docs/deploy-guide.md`](./deploy-guide.md)** (GoDaddy DNS + Ubuntu VPS + Nginx + PM2 + TLS + cron + Paystack webhook).
+
 1. [ ] Provision Linux VPS; point `prosperax.org` A-record
 2. [ ] Install: Node, Python, PostgreSQL, Nginx, certbot, PM2, git
 3. [ ] Create DB user/db; set `UPLOAD_DIR` permissions
@@ -217,6 +219,8 @@ Work top to bottom. Check off each step when done. Do not skip money/webhook ste
 5. ~~Help requests + admin review~~ (Phase 3)  
 6. ~~Paystack donate + hold ledger~~ (Phase 4)  
 7. ~~Weekly payouts + refunds~~ (Phase 5)  
-8. Phase 6: public UX and policy pages
+8. ~~Phase 6: public UX and policy pages~~  
+9. ~~Phase 7: email notices~~  
+10. Phase 8: VPS deploy — see [`docs/deploy-guide.md`](./deploy-guide.md)
 
-Next implementation step: Phase 6.
+Next implementation step: Phase 8 deploy (then Phase 9 go-live).

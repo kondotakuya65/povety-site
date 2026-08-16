@@ -9,8 +9,14 @@ Stack: **Next.js** (`apps/frontend`) + **FastAPI** (`apps/backend`) + PostgreSQL
 apps/
   frontend/   # Next.js
   backend/    # FastAPI
-docs/         # project-plan + implementation-steps
+docs/         # project-plan + implementation-steps + deploy-guide
 ```
+
+## Docs
+
+- [`docs/project-plan.md`](docs/project-plan.md) — product rules + architecture
+- [`docs/implementation-steps.md`](docs/implementation-steps.md) — phased checklist
+- [`docs/deploy-guide.md`](docs/deploy-guide.md) — VPS / Nginx / PM2 production deploy
 
 ## Prerequisites
 
@@ -166,4 +172,10 @@ MAIL_FROM=Prosperax <noreply@prosperax.org>
 Emails fire after: donation held, request approved, payout success, refund success.  
 SMS OTP stays on Termii (`SMS_PROVIDER=termii`).
 
-Next: Phase 8 — VPS deploy (`docs/implementation-steps.md`).
+## Deploy (Phase 8)
+
+Production walkthrough for GoDaddy DNS + Linux VPS:
+
+→ **[`docs/deploy-guide.md`](docs/deploy-guide.md)**
+
+Next after deploy: Phase 9 — go-live checklist (`docs/implementation-steps.md`).
