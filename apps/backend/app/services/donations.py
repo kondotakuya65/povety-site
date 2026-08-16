@@ -20,6 +20,7 @@ from app.models import (
 )
 from app.services.paystack import PaystackError, initialize_transaction, verify_transaction
 from app.services.settings import get_setting_value
+from app.services.notifications import notify_donation_received
 
 
 class DonationError(ValueError):
@@ -106,6 +107,9 @@ def initialize_donation(
     donor_email = (email or user.email or "").strip().lower()
     if not donor_email or "@" not in donor_email:
         raise DonationError("Add an email on your account (or provide one) for the payment receipt")
+
+    if not user.email:
+        user.email = donor_email
 
     reference = f"px_{secrets.token_hex(12)}"
     donation = Donation(
@@ -198,6 +202,7 @@ def mark_donation_held(db: Session, donation: Donation) -> Donation:
     )
     db.commit()
     db.refresh(donation)
+    notify_donation_received(db, donation)
     return donation
 
 

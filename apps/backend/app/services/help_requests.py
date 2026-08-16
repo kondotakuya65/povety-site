@@ -26,6 +26,7 @@ from app.models import (
     Visibility,
 )
 from app.services.settings import get_setting_value
+from app.services.notifications import notify_request_approved
 
 ALLOWED_IMAGE_TYPES = {"image/jpeg", "image/png", "image/webp"}
 MAX_PHOTO_BYTES = 5 * 1024 * 1024
@@ -355,7 +356,10 @@ def approve_request(db: Session, *, row: HelpRequest, admin: User) -> HelpReques
         )
     )
     db.commit()
-    return get_help_request(db, row.id)  # type: ignore[return-value]
+    updated = get_help_request(db, row.id)
+    if updated is not None:
+        notify_request_approved(db, updated)
+    return updated  # type: ignore[return-value]
 
 
 def reject_request(db: Session, *, row: HelpRequest, admin: User, reason: str | None) -> HelpRequest:

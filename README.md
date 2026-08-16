@@ -148,3 +148,22 @@ Separate left-sidebar area at `/admin` (no public header/footer):
 - Overview · Requests · Users · Donations · Payouts & refunds · Settings
 - APIs: `/api/admin/overview`, `/users`, `/donations`, plus existing review/money/settings endpoints
 - Admin role still comes from `ADMIN_PHONE` / `ADMIN_PHONES` in `.env`
+
+## Email notices (Phase 7)
+
+Transactional email is SMTP-ready (Brevo / SendGrid / SES / any cheap SMTP later). Local default is console logging.
+
+```env
+MAIL_PROVIDER=console   # or smtp
+SMTP_HOST=
+SMTP_PORT=587
+SMTP_USERNAME=
+SMTP_PASSWORD=
+SMTP_USE_TLS=true
+MAIL_FROM=Prosperax <noreply@prosperax.org>
+```
+
+Emails fire after: donation held, request approved, payout success, refund success.  
+SMS OTP stays on Termii (`SMS_PROVIDER=termii`).
+
+Next: Phase 8 — VPS deploy (`docs/implementation-steps.md`).

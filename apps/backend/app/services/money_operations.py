@@ -31,6 +31,7 @@ from app.services.paystack import (
     initiate_transfer,
 )
 from app.services.settings import get_setting_value
+from app.services.notifications import notify_payout_sent, notify_refund_processed
 
 
 class MoneyOperationError(ValueError):
@@ -114,6 +115,7 @@ def run_weekly_payouts(db: Session, *, admin: User) -> PayoutBatch:
     failures = 0
     created = 0
     pending = 0
+    successful_payouts: list[uuid.UUID] = []
 
     for request in funded:
         donations = _held_donations(db, request.id)
@@ -172,6 +174,7 @@ def run_weekly_payouts(db: Session, *, admin: User) -> PayoutBatch:
                 payout.status = PayoutStatus.SUCCESS.value
                 for donation in donations:
                     donation.status = DonationStatus.PAID_OUT.value
+                successful_payouts.append(payout.id)
             else:
                 # Paystack may initially return pending; webhook/retry completes it.
                 payout.status = PayoutStatus.PENDING.value
@@ -206,6 +209,10 @@ def run_weekly_payouts(db: Session, *, admin: User) -> PayoutBatch:
         )
     )
     db.commit()
+    for payout_id in successful_payouts:
+        payout = db.scalar(select(Payout).where(Payout.id == payout_id))
+        if payout is not None:
+            notify_payout_sent(db, payout)
     return get_payout_batch(db, batch.id) or batch
 
 
@@ -238,6 +245,7 @@ def process_refund(db: Session, refund: Refund) -> Refund:
         db.commit()
         return refund
 
+    newly_success = False
     try:
         result = create_refund(
             transaction_reference=donation.paystack_reference,
@@ -248,6 +256,7 @@ def process_refund(db: Session, refund: Refund) -> Refund:
         )
         if result.get("status") in {"processed", "success", "successful"}:
             _finalize_refund_success(db, refund, donation)
+            newly_success = True
         else:
             refund.status = RefundStatus.PENDING.value
     except PaystackError as exc:
@@ -256,6 +265,8 @@ def process_refund(db: Session, refund: Refund) -> Refund:
 
     db.commit()
     db.refresh(refund)
+    if newly_success:
+        notify_refund_processed(db, refund)
     return refund
 
 
@@ -476,6 +487,7 @@ def update_transfer_from_webhook(
     if payout is None:
         return None
 
+    already_success = payout.status == PayoutStatus.SUCCESS.value
     payout.paystack_transfer_code = transfer_code or payout.paystack_transfer_code
     donations = list(
         db.scalars(select(Donation).where(Donation.payout_id == payout.id)).all()
@@ -493,6 +505,8 @@ def update_transfer_from_webhook(
 
     _refresh_batch_status(db, payout.batch_id)
     db.commit()
+    if successful and not already_success:
+        notify_payout_sent(db, payout)
     return payout
 
 
@@ -514,6 +528,7 @@ def update_refund_from_webhook(
     refund = db.scalar(select(Refund).where(Refund.donation_id == donation.id))
     if refund is None:
         return None
+    already_success = refund.status == RefundStatus.SUCCESS.value
     refund.paystack_refund_reference = (
         refund_reference or refund.paystack_refund_reference
     )
@@ -524,6 +539,8 @@ def update_refund_from_webhook(
         refund.status = RefundStatus.FAILED.value
         refund.notes = failure_reason or "Paystack refund failed"
     db.commit()
+    if successful and not already_success:
+        notify_refund_processed(db, refund)
     return refund
 
 

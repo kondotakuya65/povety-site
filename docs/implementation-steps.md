@@ -146,9 +146,9 @@ Work top to bottom. Check off each step when done. Do not skip money/webhook ste
 
 ## Phase 7 — Email notices
 
-1. [ ] SMTP config from VPS/host panel
-2. [ ] Send on: donation received, request approved, payout sent, refund processed
-3. [ ] Simple HTML/text templates (English)
+1. [x] SMTP config (provider-agnostic; console fallback for local/dev)
+2. [x] Send on: donation received, request approved, payout sent, refund processed
+3. [x] Simple HTML/text templates (English)
 
 **Exit:** each money/status event emails the right user.
 

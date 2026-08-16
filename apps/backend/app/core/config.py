@@ -28,6 +28,15 @@ class Settings(BaseSettings):
     sms_provider: str = "console"
     termii_api_key: str = ""
     termii_sender_id: str = "Prosperax"
+    mail_provider: str = "console"
+    smtp_host: str = ""
+    smtp_port: int = 587
+    smtp_username: str = ""
+    smtp_password: str = ""
+    smtp_use_tls: bool = True
+    smtp_use_ssl: bool = False
+    mail_from: str = "Prosperax <noreply@prosperax.org>"
+    mail_reply_to: str = ""
     paystack_secret_key: str = ""
     paystack_public_key: str = ""
     paystack_mock: bool = True
@@ -36,6 +45,16 @@ class Settings(BaseSettings):
     @property
     def is_dev(self) -> bool:
         return self.environment.lower() in {"development", "dev", "local"}
+
+    @property
+    def mail_is_console(self) -> bool:
+        provider = self.mail_provider.strip().lower()
+        if provider == "console":
+            return True
+        if provider == "smtp":
+            return not bool(self.smtp_host.strip())
+        # Default: console unless SMTP host is configured
+        return not bool(self.smtp_host.strip())
 
     @property
     def paystack_is_mock(self) -> bool:
