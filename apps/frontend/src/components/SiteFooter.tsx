@@ -1,13 +1,14 @@
 import Link from "next/link";
 import BrandLogo from "@/components/BrandLogo";
+import { NavIcon, type NavIconName } from "@/components/NavIcon";
 
-const links = [
-  { href: "/about", label: "About" },
-  { href: "/how-it-works", label: "How it works" },
-  { href: "/terms", label: "Terms" },
-  { href: "/privacy", label: "Privacy" },
-  { href: "/refunds", label: "Refunds" },
-  { href: "/acceptable-use", label: "Acceptable use" },
+const links: { href: string; label: string; icon: NavIconName }[] = [
+  { href: "/about", label: "About", icon: "info" },
+  { href: "/how-it-works", label: "How it works", icon: "steps" },
+  { href: "/terms", label: "Terms", icon: "document" },
+  { href: "/privacy", label: "Privacy", icon: "lock" },
+  { href: "/refunds", label: "Refunds", icon: "refund" },
+  { href: "/acceptable-use", label: "Acceptable use", icon: "check" },
 ];
 
 export default function SiteFooter() {
@@ -20,13 +21,14 @@ export default function SiteFooter() {
             Mutual aid for Nigeria — peer help, held trust, weekly payout.
           </p>
         </div>
-        <nav className="grid grid-cols-2 gap-x-8 gap-y-2 text-sm sm:grid-cols-3">
+        <nav className="grid grid-cols-2 gap-x-8 gap-y-3 text-sm sm:grid-cols-3">
           {links.map((link) => (
             <Link
               key={link.href}
               href={link.href}
-              className="text-white/75 transition hover:text-white"
+              className="inline-flex items-center gap-2 text-white/75 transition hover:text-white"
             >
+              <NavIcon name={link.icon} className="h-4 w-4 opacity-90" />
               {link.label}
             </Link>
           ))}

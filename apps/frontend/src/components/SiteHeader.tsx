@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import BrandLogo from "@/components/BrandLogo";
 import ThemeToggle from "@/components/ThemeToggle";
+import { NavIcon, type NavIconName } from "@/components/NavIcon";
 import { api } from "@/lib/api";
 import { AUTH_EVENT, AuthUser, TOKEN_KEY, clearSession, getToken, isAdmin } from "@/lib/auth";
 
@@ -59,44 +60,68 @@ export default function SiteHeader() {
     window.location.href = "/";
   }
 
-  const linkClass = "text-ink-muted transition hover:text-brand";
+  const linkClass =
+    "inline-flex items-center gap-1.5 text-ink-muted transition hover:text-brand";
+
+  function Item({
+    href,
+    icon,
+    children,
+  }: {
+    href: string;
+    icon: NavIconName;
+    children: string;
+  }) {
+    return (
+      <Link href={href} className={linkClass} onClick={() => setOpen(false)}>
+        <NavIcon name={icon} />
+        {children}
+      </Link>
+    );
+  }
 
   const navLinks = (
     <>
-      <Link href="/requests" className={linkClass} onClick={() => setOpen(false)}>
+      <Item href="/requests" icon="browse">
         Browse
-      </Link>
-      <Link href="/how-it-works" className={linkClass} onClick={() => setOpen(false)}>
+      </Item>
+      <Item href="/how-it-works" icon="steps">
         How it works
-      </Link>
+      </Item>
       {!ready ? (
         <span className="text-ink-muted">…</span>
       ) : user ? (
         <>
-          <Link href="/requests/new" className={linkClass} onClick={() => setOpen(false)}>
+          <Item href="/requests/new" icon="document">
             Request help
-          </Link>
-          <Link href="/account/help" className={linkClass} onClick={() => setOpen(false)}>
+          </Item>
+          <Item href="/account/help" icon="heart">
             My help
-          </Link>
-          <Link href="/account" className={linkClass} onClick={() => setOpen(false)}>
+          </Item>
+          <Item href="/account" icon="user">
             Account
-          </Link>
+          </Item>
           {isAdmin(user) ? (
-            <Link href="/admin" className={linkClass} onClick={() => setOpen(false)}>
+            <Item href="/admin" icon="shield">
               Admin
-            </Link>
+            </Item>
           ) : null}
-          <button type="button" onClick={logout} className="text-left text-brand hover:text-brand-deep">
+          <button
+            type="button"
+            onClick={logout}
+            className="inline-flex items-center gap-1.5 text-left text-brand hover:text-brand-deep"
+          >
+            <NavIcon name="logout" />
             Log out
           </button>
         </>
       ) : (
         <Link
           href="/login"
-          className="rounded-full bg-brand px-4 py-2 text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-brand-deep"
+          className="inline-flex items-center gap-1.5 rounded-full bg-brand px-4 py-2 text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-brand-deep"
           onClick={() => setOpen(false)}
         >
+          <NavIcon name="login" />
           Log in
         </Link>
       )}
@@ -115,11 +140,11 @@ export default function SiteHeader() {
           <BrandLogo size={36} />
         </Link>
         <div className="flex items-center gap-2 sm:gap-3">
-          <nav className="hidden items-center gap-5 text-sm font-medium md:flex">{navLinks}</nav>
+          <nav className="hidden items-center gap-4 text-sm font-medium lg:flex">{navLinks}</nav>
           <ThemeToggle />
           <button
             type="button"
-            className="flex h-10 w-10 items-center justify-center rounded-full border border-line text-brand md:hidden"
+            className="flex h-10 w-10 items-center justify-center rounded-full border border-line text-brand lg:hidden"
             aria-expanded={open}
             aria-controls="mobile-nav"
             onClick={() => setOpen((v) => !v)}
@@ -140,7 +165,7 @@ export default function SiteHeader() {
       {open ? (
         <nav
           id="mobile-nav"
-          className="relative z-10 flex flex-col gap-4 border-t border-line/60 px-4 py-5 text-sm font-medium md:hidden"
+          className="relative z-10 flex flex-col gap-4 border-t border-line/60 px-4 py-5 text-sm font-medium lg:hidden"
         >
           {navLinks}
         </nav>

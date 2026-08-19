@@ -5,16 +5,17 @@ import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import BrandLogo from "@/components/BrandLogo";
 import ThemeToggle from "@/components/ThemeToggle";
+import { NavIcon, type NavIconName } from "@/components/NavIcon";
 import { api } from "@/lib/api";
 import { AuthUser, clearSession, getToken, isAdmin } from "@/lib/auth";
 
-const NAV = [
-  { href: "/admin", label: "Overview", exact: true },
-  { href: "/admin/requests", label: "Requests" },
-  { href: "/admin/users", label: "Users" },
-  { href: "/admin/donations", label: "Donations" },
-  { href: "/admin/money", label: "Payouts & refunds" },
-  { href: "/admin/settings", label: "Settings" },
+const NAV: { href: string; label: string; exact?: boolean; icon: NavIconName }[] = [
+  { href: "/admin", label: "Overview", exact: true, icon: "overview" },
+  { href: "/admin/requests", label: "Requests", icon: "document" },
+  { href: "/admin/users", label: "Users", icon: "people" },
+  { href: "/admin/donations", label: "Donations", icon: "heart" },
+  { href: "/admin/money", label: "Payouts & refunds", icon: "bank" },
+  { href: "/admin/settings", label: "Settings", icon: "settings" },
 ];
 
 export default function AdminShell({ children }: { children: React.ReactNode }) {
@@ -60,12 +61,13 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
           <Link
             key={item.href}
             href={item.href}
-            className={`rounded-xl px-3 py-2.5 text-sm font-medium transition ${
+            className={`inline-flex items-center gap-2.5 rounded-xl px-3 py-2.5 text-sm font-medium transition ${
               active
                 ? "bg-brand text-white shadow-sm"
                 : "text-ink-muted hover:bg-brand-soft hover:text-brand"
             }`}
           >
+            <NavIcon name={item.icon} className="h-[1.05rem] w-[1.05rem]" />
             {item.label}
           </Link>
         );
@@ -100,12 +102,18 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
           </p>
         </div>
         <div className="min-h-0 flex-1 overflow-y-auto">{nav}</div>
-        <div className="shrink-0 space-y-2 border-t border-line p-4 text-sm">
+        <div className="flex shrink-0 flex-col gap-2 border-t border-line p-4 text-sm">
           <p className="truncate text-ink-muted">{user.phone}</p>
-          <Link href="/" className="block text-brand hover:underline">
+          <Link href="/" className="flex items-center gap-2 text-brand hover:underline">
+            <NavIcon name="home" className="h-4 w-4" />
             View site
           </Link>
-          <button type="button" onClick={logout} className="text-left text-ink-muted hover:text-danger">
+          <button
+            type="button"
+            onClick={logout}
+            className="flex items-center gap-2 text-left text-ink-muted hover:text-danger"
+          >
+            <NavIcon name="logout" className="h-4 w-4" />
             Log out
           </button>
         </div>
