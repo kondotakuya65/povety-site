@@ -87,7 +87,7 @@ Paystack keys, SMS keys, SMTP password, JWT secret, DB URL, `UPLOAD_DIR`, bootst
 5. Deadline missed / goal unmet → refund held donations → `closed_refunded`  
 6. Funded/closed success → visibility **private**
 
-**Statuses:** `draft` → `pending_review` → `live` → `funded` | `closed_refunded` | `rejected`
+**Statuses:** `draft` → `pending_review` → `live` → `funded` | `closed_refunded` | `rejected` | `cancelled` (owner cancel while pending/live; held gifts refunded)
 
 ---
 

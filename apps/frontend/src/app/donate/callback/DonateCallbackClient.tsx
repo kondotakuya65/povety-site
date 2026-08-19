@@ -62,8 +62,8 @@ export default function DonateCallbackClient() {
             >
               Back to request
             </Link>
-            <Link href="/account" className="border border-line px-4 py-2.5 font-semibold text-ink-muted">
-              My account
+            <Link href="/account/gifts" className="border border-line px-4 py-2.5 font-semibold text-ink-muted">
+              Gifts sent
             </Link>
           </div>
         </div>

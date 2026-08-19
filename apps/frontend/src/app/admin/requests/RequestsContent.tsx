@@ -18,6 +18,7 @@ const FILTERS = [
   { value: "live", label: "Live" },
   { value: "funded", label: "Funded" },
   { value: "closed_refunded", label: "Refunded" },
+  { value: "cancelled", label: "Cancelled" },
   { value: "rejected", label: "Rejected" },
 ];
 

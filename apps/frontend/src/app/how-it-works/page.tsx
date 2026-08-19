@@ -31,8 +31,15 @@ export default function HowItWorksPage() {
       </p>
       <h2 className="font-display text-xl font-semibold text-ink">5. Donor refunds while held</h2>
       <p>
-        While a gift is still held (not yet paid out), you can request a refund from your account
-        within the configured window. Once paid out, automatic refunds are not available.
+        While a gift is still held (not yet paid out), you can request a refund from{" "}
+        <strong>Account → Gifts sent</strong> within the configured window. Once paid out, automatic
+        refunds are not available.
+      </p>
+      <h2 className="font-display text-xl font-semibold text-ink">6. Cancelling a request</h2>
+      <p>
+        From <strong>Account → Help history</strong> you can cancel a request that is still pending
+        review or live. Held gifts are refunded to donors. After the goal is fully funded, cancel is
+        no longer available because weekly payout is already queued.
       </p>
     </PolicyShell>
   );

@@ -20,7 +20,7 @@ class HelpRequest(Base):
     __tablename__ = "help_requests"
     __table_args__ = (
         CheckConstraint(
-            "status IN ('draft', 'pending_review', 'live', 'funded', 'closed_refunded', 'rejected')",
+            "status IN ('draft', 'pending_review', 'live', 'funded', 'closed_refunded', 'rejected', 'cancelled')",
             name="ck_help_requests_status",
         ),
         CheckConstraint(

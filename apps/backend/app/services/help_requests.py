@@ -16,11 +16,16 @@ from app.core.config import settings
 from app.core.phone import InvalidPhoneError, normalize_ng_phone
 from app.models import (
     AuditLog,
+    Donation,
+    DonationStatus,
     HelpRequest,
     HelpRequestStatus,
     MediaAsset,
     MediaKind,
     OPEN_HELP_REQUEST_STATUSES,
+    Refund,
+    RefundReason,
+    RefundStatus,
     User,
     VerificationType,
     Visibility,
@@ -378,6 +383,74 @@ def reject_request(db: Session, *, row: HelpRequest, admin: User, reason: str | 
             entity_type="help_request",
             entity_id=str(row.id),
             payload={"reason": (reason or "").strip() or None},
+        )
+    )
+    db.commit()
+    return get_help_request(db, row.id)  # type: ignore[return-value]
+
+
+def cancel_request(db: Session, *, row: HelpRequest, user: User) -> HelpRequest:
+    if row.user_id != user.id:
+        raise HelpRequestError("Help request not found")
+    if row.status == HelpRequestStatus.CANCELLED.value:
+        return row
+    if row.status not in {
+        HelpRequestStatus.DRAFT.value,
+        HelpRequestStatus.PENDING_REVIEW.value,
+        HelpRequestStatus.LIVE.value,
+    }:
+        if row.status == HelpRequestStatus.FUNDED.value:
+            raise HelpRequestError(
+                "This request is already funded. Cancel is not available after the goal is met."
+            )
+        raise HelpRequestError("This request can no longer be cancelled")
+
+    from app.services.money_operations import process_refund
+
+    held = list(
+        db.scalars(
+            select(Donation).where(
+                Donation.help_request_id == row.id,
+                Donation.status == DonationStatus.HELD.value,
+            )
+        ).all()
+    )
+    refunded = 0
+    failed = 0
+    for donation in held:
+        existing = db.scalar(select(Refund).where(Refund.donation_id == donation.id))
+        if existing is None:
+            existing = Refund(
+                donation_id=donation.id,
+                amount=donation.gross_amount,
+                reason=RefundReason.REQUEST_CANCELLED.value,
+                status=RefundStatus.PENDING.value,
+                requested_by_id=user.id,
+            )
+            db.add(existing)
+            db.flush()
+        elif existing.status == RefundStatus.SUCCESS.value:
+            refunded += 1
+            continue
+        else:
+            existing.status = RefundStatus.PENDING.value
+            existing.notes = None
+            existing.reason = RefundReason.REQUEST_CANCELLED.value
+        result = process_refund(db, existing)
+        if result.status == RefundStatus.SUCCESS.value:
+            refunded += 1
+        elif result.status == RefundStatus.FAILED.value:
+            failed += 1
+
+    row.status = HelpRequestStatus.CANCELLED.value
+    row.visibility = Visibility.PRIVATE.value
+    db.add(
+        AuditLog(
+            actor_user_id=user.id,
+            action="help_request_cancel",
+            entity_type="help_request",
+            entity_id=str(row.id),
+            payload={"refunded": refunded, "failed": failed, "held": len(held)},
         )
     )
     db.commit()

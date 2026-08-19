@@ -11,6 +11,7 @@ from app.core.database import get_db
 from app.models import HelpRequestStatus, User, UserRole, Visibility
 from app.services.help_requests import (
     HelpRequestError,
+    cancel_request,
     create_help_request,
     get_help_request,
     list_live_requests,
@@ -60,6 +61,22 @@ def update_my_bank_details(
             account_number=body.account_number,
             account_name=body.account_name,
         )
+    except HelpRequestError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    return serialize_help_request(updated, include_private=True)
+
+
+@router.post("/{request_id}/cancel")
+def cancel_my_request(
+    request_id: uuid.UUID,
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> dict:
+    row = get_help_request(db, request_id)
+    if row is None or row.user_id != user.id:
+        raise HTTPException(status_code=404, detail="Help request not found")
+    try:
+        updated = cancel_request(db, row=row, user=user)
     except HelpRequestError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
     return serialize_help_request(updated, include_private=True)

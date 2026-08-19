@@ -13,6 +13,7 @@ class HelpRequestStatus(StrEnum):
     FUNDED = "funded"
     CLOSED_REFUNDED = "closed_refunded"
     REJECTED = "rejected"
+    CANCELLED = "cancelled"
 
 
 OPEN_HELP_REQUEST_STATUSES = (
@@ -62,6 +63,7 @@ class RefundReason(StrEnum):
     DONOR_REQUESTED = "donor_requested"
     FAILED_CHARGE = "failed_charge"
     DUPLICATE = "duplicate"
+    REQUEST_CANCELLED = "request_cancelled"
 
 
 class SettingValueType(StrEnum):

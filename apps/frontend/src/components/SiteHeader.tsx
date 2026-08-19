@@ -75,6 +75,9 @@ export default function SiteHeader() {
           <Link href="/requests/new" className={linkClass} onClick={() => setOpen(false)}>
             Request help
           </Link>
+          <Link href="/account/help" className={linkClass} onClick={() => setOpen(false)}>
+            My help
+          </Link>
           <Link href="/account" className={linkClass} onClick={() => setOpen(false)}>
             Account
           </Link>

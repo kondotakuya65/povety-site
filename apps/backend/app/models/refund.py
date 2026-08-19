@@ -20,7 +20,7 @@ class Refund(Base):
             name="ck_refunds_status",
         ),
         CheckConstraint(
-            "reason IN ('unmet_goal', 'donor_requested', 'failed_charge', 'duplicate')",
+            "reason IN ('unmet_goal', 'donor_requested', 'failed_charge', 'duplicate', 'request_cancelled')",
             name="ck_refunds_reason",
         ),
         CheckConstraint("amount > 0", name="ck_refunds_amount_positive"),

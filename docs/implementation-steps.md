@@ -32,7 +32,7 @@ Work top to bottom. Check off each step when done. Do not skip money/webhook ste
 1. [x] ORM/migrations: SQLAlchemy 2 + Alembic
 2. [x] Tables: `users`, `help_requests`, `donations` (fee snapshot columns), `payouts` / `payout_batches`, `refunds`, `app_settings`, `media_assets`, `audit_logs`
 3. [x] Enums/constraints:
-   - request statuses: `draft | pending_review | live | funded | closed_refunded | rejected`
+   - request statuses: `draft | pending_review | live | funded | closed_refunded | rejected | cancelled`
    - donation statuses: `held | paid_out | refunded`
    - visibility: public only while `live` (CHECK)
    - **one open request per user** (partial unique index on `draft|pending_review|live`)
@@ -82,7 +82,7 @@ Work top to bottom. Check off each step when done. Do not skip money/webhook ste
 5. [x] Admin list pending; approve → `live` (+ `deadline_at`); reject → `rejected`
 6. [x] Public list/detail: **only `live`** (owners/admins can view own non-public)
 7. [x] Non-live stays **private** (visibility CHECK)
-8. [x] User dashboard: my request + status (`/account`)
+8. [x] User dashboard: account settings + help/gift history (`/account`, `/account/help`, `/account/gifts`); owner cancel while pending/live
 9. [x] Audit log for create / approve / reject
 
 **Exit:** full create → review → live path works without payments.
@@ -98,7 +98,7 @@ Work top to bottom. Check off each step when done. Do not skip money/webhook ste
 4. [x] `POST /api/webhooks/paystack` — signature verify; idempotent by reference
 5. [x] On success → `Donation.status = held`; raised uses **net_to_request**
 6. [x] Progress + recent supporters on request detail
-7. [x] Donor history: `GET /api/donations/mine` + `/account`
+7. [x] Donor history: `GET /api/donations/mine` + `/account/gifts`
 8. [x] Confirm via `POST /api/donations/confirm` (callback); never trust frontend alone
 9. [x] Net amount reserved for later weekly payouts (fee stays in platform balance when fee > 0)
 
