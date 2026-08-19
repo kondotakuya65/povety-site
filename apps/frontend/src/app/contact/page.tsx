@@ -68,12 +68,20 @@ export default function ContactPage() {
       {whatsapp || supportEmail ? (
         <div className="mt-6 flex flex-wrap gap-3 text-sm">
           {supportEmail ? (
-            <a href={`mailto:${supportEmail}`} className="font-medium text-brand hover:underline">
+            <a
+              href={`mailto:${supportEmail}`}
+              className="rounded-full border border-line bg-surface-elevated px-4 py-2 font-medium text-brand hover:border-brand"
+            >
               {supportEmail}
             </a>
           ) : null}
           {whatsapp ? (
-            <a href={whatsapp} className="font-medium text-brand hover:underline" target="_blank" rel="noreferrer">
+            <a
+              href={whatsapp}
+              className="rounded-full border border-line bg-surface-elevated px-4 py-2 font-medium text-brand hover:border-brand"
+              target="_blank"
+              rel="noreferrer"
+            >
               WhatsApp
             </a>
           ) : null}
@@ -81,7 +89,7 @@ export default function ContactPage() {
       ) : null}
 
       {done ? (
-        <div className="mt-10 rounded-2xl border border-line bg-surface-elevated p-6">
+        <div className="mt-10 rounded-2xl border border-line bg-surface-elevated p-6 shadow-sm">
           <p className="font-display text-2xl font-semibold text-ink">Message sent</p>
           <p className="mt-2 text-ink-muted">
             Thank you. If you included an email, we will reply there. Please allow a little time
@@ -89,11 +97,14 @@ export default function ContactPage() {
           </p>
         </div>
       ) : (
-        <form onSubmit={submit} className="mt-8 space-y-4">
+        <form
+          onSubmit={submit}
+          className="mt-8 space-y-4 rounded-2xl border border-line bg-surface-elevated p-5 shadow-sm sm:p-6"
+        >
           <label className="block text-sm font-medium text-ink">
             Name
             <input
-              className="mt-2 w-full border border-line bg-surface-elevated px-3 py-2.5 text-ink outline-none focus:border-brand"
+              className="mt-2 w-full rounded-xl border border-line bg-surface-elevated px-4 py-3 text-ink outline-none focus:border-brand focus:ring-2 focus:ring-brand/10"
               value={name}
               onChange={(e) => setName(e.target.value)}
               required
@@ -105,7 +116,7 @@ export default function ContactPage() {
             Email
             <input
               type="email"
-              className="mt-2 w-full border border-line bg-surface-elevated px-3 py-2.5 text-ink outline-none focus:border-brand"
+              className="mt-2 w-full rounded-xl border border-line bg-surface-elevated px-4 py-3 text-ink outline-none focus:border-brand focus:ring-2 focus:ring-brand/10"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
@@ -114,7 +125,7 @@ export default function ContactPage() {
           <label className="block text-sm font-medium text-ink">
             Phone <span className="font-normal text-ink-muted">(optional)</span>
             <input
-              className="mt-2 w-full border border-line bg-surface-elevated px-3 py-2.5 text-ink outline-none focus:border-brand"
+              className="mt-2 w-full rounded-xl border border-line bg-surface-elevated px-4 py-3 text-ink outline-none focus:border-brand focus:ring-2 focus:ring-brand/10"
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
               placeholder="0803 123 4567"
@@ -123,7 +134,7 @@ export default function ContactPage() {
           <label className="block text-sm font-medium text-ink">
             Topic
             <select
-              className="mt-2 w-full border border-line bg-surface-elevated px-3 py-2.5 text-ink outline-none focus:border-brand"
+              className="mt-2 w-full rounded-xl border border-line bg-surface-elevated px-4 py-3 text-ink outline-none focus:border-brand focus:ring-2 focus:ring-brand/10"
               value={topic}
               onChange={(e) => setTopic(e.target.value)}
             >
@@ -137,7 +148,7 @@ export default function ContactPage() {
           <label className="block text-sm font-medium text-ink">
             Message
             <textarea
-              className="mt-2 min-h-36 w-full border border-line bg-surface-elevated px-3 py-2.5 text-ink outline-none focus:border-brand"
+              className="mt-2 min-h-36 w-full rounded-xl border border-line bg-surface-elevated px-4 py-3 text-ink outline-none focus:border-brand focus:ring-2 focus:ring-brand/10"
               value={message}
               onChange={(e) => setMessage(e.target.value)}
               required
