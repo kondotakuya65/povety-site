@@ -138,7 +138,7 @@ Work top to bottom. Check off each step when done. Do not skip money/webhook ste
 4. [x] Create request flow
 5. [x] User dashboard
 6. [x] Admin console (review, payouts, refunds, **settings**)
-7. [x] Policy pages: About, How it works, Terms, Privacy, Refunds, Acceptable use (use plan disallowed list)
+7. [x] Policy pages: About, How it works, Terms, Privacy, Refunds, Acceptable use, Contact (`/contact`)
 
 **Exit:** all plan screens usable end-to-end on mobile + desktop.
 

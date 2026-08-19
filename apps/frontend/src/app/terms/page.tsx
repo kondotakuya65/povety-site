@@ -33,7 +33,11 @@ export default function TermsPage() {
       <h2 className="font-display text-xl font-semibold text-ink">Limitation</h2>
       <p>
         Prosperax is provided as-is. To the extent permitted by law, we are not liable for disputes
-        between users, bank delays, or Paystack outages. Contact support for operational issues.
+        between users, bank delays, or Paystack outages. Use{" "}
+        <a href="/contact" className="text-brand hover:underline">
+          Contact us
+        </a>{" "}
+        for operational issues.
       </p>
     </PolicyShell>
   );

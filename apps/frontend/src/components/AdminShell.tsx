@@ -15,6 +15,7 @@ const NAV: { href: string; label: string; exact?: boolean; icon: NavIconName }[]
   { href: "/admin/users", label: "Users", icon: "people" },
   { href: "/admin/donations", label: "Donations", icon: "heart" },
   { href: "/admin/money", label: "Payouts & refunds", icon: "bank" },
+  { href: "/admin/messages", label: "Messages", icon: "mail" },
   { href: "/admin/settings", label: "Settings", icon: "settings" },
 ];
 

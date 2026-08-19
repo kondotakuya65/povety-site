@@ -94,3 +94,24 @@ def notify_refund_processed(db: Session, refund: Refund) -> None:
         account_url=_account_url(),
     )
     safe_send_email(to=to, subject=subject, text_body=text, html_body=html)
+
+
+def notify_contact_message(db: Session, row: object) -> None:
+    from app.services.contact import TOPIC_LABELS, support_inbox_email
+
+    to = support_inbox_email(db)
+    subject, text, html = email_templates.contact_received(
+        name=getattr(row, "name", ""),
+        email=getattr(row, "email", ""),
+        phone=getattr(row, "phone", None) or "—",
+        topic_label=TOPIC_LABELS.get(getattr(row, "topic", ""), getattr(row, "topic", "")),
+        body=getattr(row, "body", ""),
+        inbox_url=f"{settings.frontend_url.rstrip('/')}/admin/messages",
+    )
+    safe_send_email(
+        to=to,
+        subject=subject,
+        text_body=text,
+        html_body=html,
+        reply_to=getattr(row, "email", None),
+    )

@@ -132,6 +132,12 @@ const PATHS = {
       <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
     </>
   ),
+  mail: (
+    <>
+      <rect x="3" y="5" width="18" height="14" rx="2" />
+      <path d="m3 7 9 7 9-7" />
+    </>
+  ),
 } as const;
 
 export type NavIconName = keyof typeof PATHS;

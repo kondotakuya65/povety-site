@@ -29,6 +29,7 @@ const ORDER = [
   "payout_weekday",
   "site_tagline",
   "whatsapp_follow_url",
+  "support_email",
   "maintenance_mode",
 ];
 

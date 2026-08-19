@@ -60,6 +60,7 @@ Default **platform fee = 0%**; change later without redeploy.
 | `unmet_goal_refund_business_days` | `3` | Auto-refund delay after deadline |
 | `min_donation_ngn` | `500` | Minimum donate amount |
 | `whatsapp_follow_url` | `` | Home WhatsApp CTA |
+| `support_email` | `` | Contact-form inbox (falls back to `ADMIN_EMAIL`) |
 | `site_tagline` | `Mutual aid for Nigeria.` | Home/brand line |
 | `payout_weekday` | `1` | Weekly payout day (0=Mon…6=Sun) |
 | `maintenance_mode` | `false` | Optional soft lock for donate/create |
@@ -101,9 +102,9 @@ Paystack keys, SMS keys, SMTP password, JWT secret, DB URL, `UPLOAD_DIR`, bootst
 6. Admin: approve/reject, weekly payout batch, refund tools, **Settings**  
 7. Deadline unmet-goal refunds + donor refunds while `held`  
 8. Receipts / basic history + email notices (donation, approved, payout, refund)  
-9. Policy pages: About, How it works, Terms, Privacy, Refunds, Acceptable use  
+9. Policy pages: About, How it works, Terms, Privacy, Refunds, Acceptable use, Contact  
 
-**Screens:** Home · Browse · Request detail + donate · Create request · User dashboard · Admin (review / payouts / refunds / **settings**) · Policy pages  
+**Screens:** Home · Browse · Request detail + donate · Create request · User dashboard · Admin (review / payouts / refunds / messages / **settings**) · Policy pages · Contact  
 
 **Refund rules**
 | Case | Behavior |

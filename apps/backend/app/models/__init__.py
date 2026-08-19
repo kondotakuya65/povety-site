@@ -1,5 +1,6 @@
 from app.models.app_setting import AppSetting
 from app.models.audit_log import AuditLog
+from app.models.contact_message import ContactMessage
 from app.models.donation import Donation
 from app.models.enums import (
     DonationStatus,
@@ -25,6 +26,7 @@ from app.models.user import User
 __all__ = [
     "AppSetting",
     "AuditLog",
+    "ContactMessage",
     "Donation",
     "DonationStatus",
     "HelpRequest",

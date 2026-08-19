@@ -8,6 +8,7 @@ const links: { href: string; label: string; icon: NavIconName }[] = [
   { href: "/terms", label: "Terms", icon: "document" },
   { href: "/privacy", label: "Privacy", icon: "lock" },
   { href: "/refunds", label: "Refunds", icon: "refund" },
+  { href: "/contact", label: "Contact us", icon: "mail" },
   { href: "/acceptable-use", label: "Acceptable use", icon: "check" },
 ];
 

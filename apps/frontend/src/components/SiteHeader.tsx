@@ -88,6 +88,9 @@ export default function SiteHeader() {
       <Item href="/how-it-works" icon="steps">
         How it works
       </Item>
+      <Item href="/contact" icon="mail">
+        Contact
+      </Item>
       {!ready ? (
         <span className="text-ink-muted">…</span>
       ) : user ? (

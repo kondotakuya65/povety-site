@@ -30,8 +30,11 @@ export default function PrivacyPage() {
         open.
       </p>
       <p>
-        For privacy questions related to prosperax.org, contact the site operator listed on the live
-        site.
+        For privacy questions related to prosperax.org, use{" "}
+        <a href="/contact" className="text-brand hover:underline">
+          Contact us
+        </a>
+        .
       </p>
     </PolicyShell>
   );

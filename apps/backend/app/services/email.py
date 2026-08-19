@@ -27,6 +27,7 @@ def send_email(
     subject: str,
     text_body: str,
     html_body: str | None = None,
+    reply_to: str | None = None,
 ) -> None:
     """Send email via SMTP, or log to console when mail is not configured."""
     recipient = (to or "").strip().lower()
@@ -35,14 +36,16 @@ def send_email(
 
     if settings.mail_is_console:
         logger.info(
-            "EMAIL console to=%s subject=%s\n%s",
+            "EMAIL console to=%s subject=%s reply_to=%s\n%s",
             recipient,
             subject,
+            reply_to,
             text_body,
         )
         print(
             f"\n===== Prosperax email (console) =====\n"
             f"To: {recipient}\n"
+            f"Reply-To: {reply_to or ''}\n"
             f"Subject: {subject}\n\n"
             f"{text_body}\n"
             f"===== end email =====\n",
@@ -58,8 +61,9 @@ def send_email(
     message["Subject"] = subject
     message["From"] = f"{from_name} <{from_addr}>" if from_name else from_addr
     message["To"] = recipient
-    if settings.mail_reply_to.strip():
-        message["Reply-To"] = settings.mail_reply_to.strip()
+    reply = (reply_to or settings.mail_reply_to).strip()
+    if reply:
+        message["Reply-To"] = reply
     message.set_content(text_body)
     if html_body:
         message.add_alternative(html_body, subtype="html")
@@ -87,13 +91,20 @@ def safe_send_email(
     subject: str,
     text_body: str,
     html_body: str | None = None,
+    reply_to: str | None = None,
 ) -> bool:
     """Best-effort send; never raises. Returns True if accepted/logged."""
     if not to:
         logger.info("Skip email %r — no recipient", subject)
         return False
     try:
-        send_email(to=to, subject=subject, text_body=text_body, html_body=html_body)
+        send_email(
+            to=to,
+            subject=subject,
+            text_body=text_body,
+            html_body=html_body,
+            reply_to=reply_to,
+        )
         return True
     except Exception:  # noqa: BLE001
         logger.exception("Failed to send email %r to %s", subject, to)

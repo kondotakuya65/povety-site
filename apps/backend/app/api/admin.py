@@ -19,6 +19,14 @@ from app.models import (
     Refund,
     User,
 )
+from app.services.contact import (
+    ContactError,
+    count_new_contact_messages,
+    get_contact_message,
+    list_contact_messages,
+    mark_contact_message,
+    serialize_contact_message,
+)
 from app.services.help_requests import (
     HelpRequestError,
     approve_request,
@@ -50,6 +58,10 @@ router = APIRouter(prefix="/admin", tags=["admin"])
 
 class SettingsPatchBody(BaseModel):
     settings: dict[str, object] = Field(default_factory=dict)
+
+
+class ContactStatusBody(BaseModel):
+    status: str = Field(pattern="^(new|read)$")
 
 
 class RejectBody(BaseModel):
@@ -178,6 +190,7 @@ def admin_overview(
             "held_total_ngn": held_total,
             "gifted_last_7_days_ngn": gifted_week,
             "open_refunds": open_refunds,
+            "new_messages": count_new_contact_messages(db),
         },
         "recent_requests": [
             serialize_help_request(row, include_private=True) for row in recent_requests
@@ -380,3 +393,36 @@ def admin_patch_settings(
 ) -> dict:
     rows = update_settings(db, updates=body.settings, admin=admin)
     return {"ok": True, "settings": [serialize_setting(row) for row in rows]}
+
+
+@router.get("/contact-messages")
+def admin_list_contact_messages(
+    status: str | None = None,
+    admin: User = Depends(get_current_admin),
+    db: Session = Depends(get_db),
+) -> dict:
+    _ = admin
+    if status and status not in {"new", "read"}:
+        raise HTTPException(status_code=400, detail="Invalid status filter")
+    rows = list_contact_messages(db, status=status)
+    return {
+        "items": [serialize_contact_message(row) for row in rows],
+        "new_count": count_new_contact_messages(db),
+    }
+
+
+@router.patch("/contact-messages/{message_id}")
+def admin_update_contact_message(
+    message_id: uuid.UUID,
+    body: ContactStatusBody,
+    admin: User = Depends(get_current_admin),
+    db: Session = Depends(get_db),
+) -> dict:
+    row = get_contact_message(db, message_id)
+    if row is None:
+        raise HTTPException(status_code=404, detail="Message not found")
+    try:
+        updated = mark_contact_message(db, row=row, status=body.status, admin=admin)
+    except ContactError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    return serialize_contact_message(updated)

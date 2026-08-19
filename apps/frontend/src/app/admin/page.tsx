@@ -15,6 +15,7 @@ type Overview = {
     held_total_ngn: number;
     gifted_last_7_days_ngn: number;
     open_refunds: number;
+    new_messages: number;
   };
   recent_requests: Array<{
     id: string;
@@ -56,6 +57,7 @@ export default function AdminOverviewPage() {
     { label: "Held total", value: formatNgn(data.stats.held_total_ngn), href: "/admin/money" },
     { label: "Gifted (7 days)", value: formatNgn(data.stats.gifted_last_7_days_ngn), href: "/admin/donations" },
     { label: "Open refunds", value: data.stats.open_refunds, href: "/admin/money" },
+    { label: "New messages", value: data.stats.new_messages, href: "/admin/messages" },
   ];
 
   return (

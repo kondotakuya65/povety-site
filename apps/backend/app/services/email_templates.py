@@ -112,6 +112,32 @@ def payout_sent(
     return subject, text, html
 
 
+def contact_received(
+    *,
+    name: str,
+    email: str,
+    phone: str,
+    topic_label: str,
+    body: str,
+    inbox_url: str,
+) -> tuple[str, str, str]:
+    subject = f"Contact form — {topic_label}"
+    text, html = _shell(
+        "New message from the contact form",
+        f"{name} sent a message through prosperax.org. Reply to them at {email}.",
+        [
+            ("Name", name),
+            ("Email", email),
+            ("Phone", phone),
+            ("Topic", topic_label),
+            ("Message", body),
+        ],
+        "Open inbox",
+        inbox_url,
+    )
+    return subject, text, html
+
+
 def refund_processed(
     *,
     amount_label: str,

@@ -13,6 +13,7 @@ PUBLIC_SETTING_KEYS = (
     "platform_fee_percent",
     "min_donation_ngn",
     "whatsapp_follow_url",
+    "support_email",
     "site_tagline",
     "maintenance_mode",
 )
@@ -71,6 +72,12 @@ SETTING_META: dict[str, SettingMeta] = {
         key="whatsapp_follow_url",
         label="WhatsApp follow URL",
         description="Homepage WhatsApp CTA link (channel or community).",
+        value_type="string",
+    ),
+    "support_email": SettingMeta(
+        key="support_email",
+        label="Support inbox email",
+        description="Where contact-form messages are emailed. Leave blank to use ADMIN_EMAIL.",
         value_type="string",
     ),
     "site_tagline": SettingMeta(
@@ -206,6 +213,11 @@ def validate_and_normalize(key: str, raw_value: object) -> tuple[str, str]:
         if len(text) > 500:
             raise HTTPException(status_code=400, detail="whatsapp_follow_url is too long")
         return text, meta.value_type
+
+    if key == "support_email":
+        if text and ("@" not in text or len(text) > 255):
+            raise HTTPException(status_code=400, detail="support_email must be a valid email or blank")
+        return text.lower(), meta.value_type
 
     return text, meta.value_type
 
