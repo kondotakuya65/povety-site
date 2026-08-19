@@ -286,8 +286,8 @@ export default async function HomePage() {
             Simple mutual aid: publish a need, neighbours give, Prosperax holds the money until
             weekly payout.
           </p>
-          <ol className="mt-10 grid gap-5 sm:grid-cols-3">
-            <li className="feature-card">
+          <div className="feature-flow mt-10">
+            <article className="feature-card feature-step-1">
               <span className="feature-icon">{icons.document}</span>
               <p className="mt-5 text-xs font-bold uppercase tracking-[0.18em] text-brand-mid">Step 01</p>
               <h3 className="mt-2 font-display text-xl font-semibold text-ink">Share a need</h3>
@@ -295,26 +295,32 @@ export default async function HomePage() {
                 Create one open request with your story, photo, and bank details. Admin reviews before
                 it goes live.
               </p>
-            </li>
-            <li className="feature-card">
+            </article>
+            <span className="feature-flow-arrow" aria-hidden="true">
+              {icons.arrow}
+            </span>
+            <article className="feature-card feature-step-2">
               <span className="feature-icon">{icons.lock}</span>
-              <p className="mt-5 text-xs font-bold uppercase tracking-[0.18em] text-brand-mid">Step 02</p>
+              <p className="mt-5 text-xs font-bold uppercase tracking-[0.18em] text-[#9a7a32]">Step 02</p>
               <h3 className="mt-2 font-display text-xl font-semibold text-ink">Give with hold</h3>
               <p className="mt-2 text-sm text-ink-muted">
                 Donors pay via Paystack. Funds stay held — not spent — until the request is funded
                 and ready for transfer.
               </p>
-            </li>
-            <li className="feature-card">
+            </article>
+            <span className="feature-flow-arrow" aria-hidden="true">
+              {icons.arrow}
+            </span>
+            <article className="feature-card feature-step-3">
               <span className="feature-icon">{icons.bank}</span>
-              <p className="mt-5 text-xs font-bold uppercase tracking-[0.18em] text-brand-mid">Step 03</p>
-              <h3 className="mt-2 font-display text-xl font-semibold text-ink">Weekly payout</h3>
-              <p className="mt-2 text-sm text-ink-muted">
+              <p className="mt-5 text-xs font-bold uppercase tracking-[0.18em] text-white/75">Step 03</p>
+              <h3 className="mt-2 font-display text-xl font-semibold text-white">Weekly payout</h3>
+              <p className="mt-2 text-sm text-white/80">
                 When the goal is met, Prosperax pays out weekly to the recipient. Unmet goals are
                 refunded.
               </p>
-            </li>
-          </ol>
+            </article>
+          </div>
           <Link href="/how-it-works" className="icon-button mt-8 w-fit font-semibold text-brand hover:text-brand-deep">
             Read the full flow {icons.arrow}
           </Link>
