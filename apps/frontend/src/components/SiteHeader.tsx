@@ -103,8 +103,13 @@ export default function SiteHeader() {
   );
 
   return (
-    <header className="sticky top-0 z-40 border-b border-line/70 bg-surface-elevated/92 shadow-[0_4px_24px_rgba(10,77,44,0.04)] backdrop-blur-md">
-      <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-4 sm:px-6">
+    <header className="site-header sticky top-0 z-40">
+      <div className="site-header-bg" aria-hidden="true">
+        <span className="site-header-orb site-header-orb-green" />
+        <span className="site-header-orb site-header-orb-gold" />
+        <span className="site-header-sheen" />
+      </div>
+      <div className="relative z-10 mx-auto flex max-w-5xl items-center justify-between px-4 py-4 sm:px-6">
         <Link href="/" className="transition hover:opacity-90" aria-label="Prosperax home">
           <BrandLogo size={36} />
         </Link>
@@ -131,7 +136,7 @@ export default function SiteHeader() {
       {open ? (
         <nav
           id="mobile-nav"
-          className="flex flex-col gap-4 border-t border-line bg-white px-4 py-5 text-sm font-medium shadow-xl md:hidden"
+          className="relative z-10 flex flex-col gap-4 border-t border-line/60 px-4 py-5 text-sm font-medium md:hidden"
         >
           {navLinks}
         </nav>
