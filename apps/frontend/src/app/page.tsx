@@ -184,7 +184,7 @@ export default async function HomePage() {
   return (
     <div>
       {settings.maintenance_mode ? (
-        <p className="border-b border-line bg-brand-soft px-4 py-3 text-center text-sm text-brand-deep">
+        <p className="border-b border-line bg-brand-soft px-4 py-3 text-center text-sm text-brand">
           Maintenance mode is on. Creating requests is temporarily disabled.
         </p>
       ) : null}
@@ -196,7 +196,7 @@ export default async function HomePage() {
         primaryCta={
           <Link
             href="/requests"
-            className="icon-button bg-white px-5 py-3 font-semibold text-brand-deep shadow-xl shadow-black/15 transition hover:-translate-y-0.5 hover:bg-brand-soft"
+            className="icon-button bg-white px-5 py-3 font-semibold text-[#0a4d2c] shadow-xl shadow-black/15 transition hover:-translate-y-0.5 hover:bg-white/90"
           >
             {icons.heart} Send help {icons.arrow}
           </Link>
@@ -212,7 +212,7 @@ export default async function HomePage() {
       />
 
       <section className="relative z-10 -mt-8 px-4 sm:px-6">
-        <div className="mx-auto grid max-w-5xl grid-cols-2 overflow-hidden rounded-2xl border border-white/70 bg-white/95 shadow-2xl shadow-brand-deep/10 backdrop-blur sm:grid-cols-4">
+        <div className="mx-auto grid max-w-5xl grid-cols-2 overflow-hidden rounded-2xl border border-line bg-surface-elevated/95 shadow-2xl shadow-brand-deep/10 backdrop-blur sm:grid-cols-4">
           <div className="stat-item p-5 sm:p-7">
             <span className="mb-3 flex h-10 w-10 items-center justify-center rounded-xl bg-brand-soft text-brand">{icons.people}</span>
             <p className="font-display text-3xl font-semibold text-brand">{stats.live_requests}</p>
@@ -336,7 +336,7 @@ export default async function HomePage() {
           </div>
           <div className="grid gap-8 sm:grid-cols-3">
             {teaser.map((item) => (
-              <Link key={item.id} href={`/requests/${item.id}`} className="request-card group block overflow-hidden rounded-2xl bg-white">
+              <Link key={item.id} href={`/requests/${item.id}`} className="request-card group block overflow-hidden rounded-2xl bg-surface-elevated">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={requestPhoto(item.photo_url)}

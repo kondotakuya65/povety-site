@@ -89,7 +89,7 @@ export default function AdminRequestsContent() {
             className={`rounded-full px-4 py-2 text-sm font-medium transition ${
               status === filter.value
                 ? "bg-brand text-white"
-                : "border border-line bg-white text-ink-muted hover:border-brand"
+                : "border border-line bg-surface-elevated text-ink-muted hover:border-brand"
             }`}
           >
             {filter.label}
@@ -103,7 +103,7 @@ export default function AdminRequestsContent() {
         {items.map((item) => (
           <article
             key={item.id}
-            className="overflow-hidden rounded-2xl border border-line bg-white shadow-sm"
+            className="overflow-hidden rounded-2xl border border-line bg-surface-elevated shadow-sm"
           >
             <div className="flex flex-col gap-4 p-4 sm:flex-row sm:p-5">
               {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -169,7 +169,7 @@ export default function AdminRequestsContent() {
           </article>
         ))}
         {items.length === 0 ? (
-          <p className="rounded-2xl border border-dashed border-line bg-white px-5 py-10 text-center text-ink-muted">
+          <p className="rounded-2xl border border-dashed border-line bg-surface-elevated px-5 py-10 text-center text-ink-muted">
             No requests in this filter.
           </p>
         ) : null}

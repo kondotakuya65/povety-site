@@ -16,6 +16,37 @@
   --danger: #b42318;
   --background: var(--surface);
   --foreground: var(--ink);
+  --glow-green: rgba(26, 143, 84, 0.13);
+  --glow-gold: rgba(196, 163, 90, 0.1);
+  --header-glass: rgba(255, 255, 255, 0.62);
+  --header-line: rgba(197, 221, 208, 0.7);
+  --card-border: rgba(197, 221, 208, 0.85);
+  --card-fill: rgba(255, 255, 255, 0.86);
+  --sheen: rgba(255, 255, 255, 0.28);
+  color-scheme: light;
+}
+
+html.dark {
+  --brand: #2eb86a;
+  --brand-deep: #1f8f52;
+  --brand-mid: #6ed49a;
+  --brand-soft: #163526;
+  --brand-mist: #102018;
+  --ink: #e7f3ec;
+  --ink-muted: #a8c4b4;
+  --line: #2c4a3b;
+  --surface: #0c1511;
+  --surface-elevated: #14211b;
+  --accent-warm: #d4b56a;
+  --danger: #f07167;
+  --glow-green: rgba(50, 196, 111, 0.12);
+  --glow-gold: rgba(196, 163, 90, 0.08);
+  --header-glass: rgba(12, 21, 17, 0.78);
+  --header-line: rgba(44, 74, 59, 0.85);
+  --card-border: rgba(44, 74, 59, 0.95);
+  --card-fill: rgba(20, 33, 27, 0.92);
+  --sheen: rgba(255, 255, 255, 0.06);
+  color-scheme: dark;
 }
 
 @theme inline {
@@ -39,8 +70,8 @@
 
 body {
   background:
-    radial-gradient(1200px 600px at 10% -10%, rgba(26, 143, 84, 0.13), transparent 55%),
-    radial-gradient(900px 500px at 100% 0%, rgba(196, 163, 90, 0.1), transparent 50%),
+    radial-gradient(1200px 600px at 10% -10%, var(--glow-green), transparent 55%),
+    radial-gradient(900px 500px at 100% 0%, var(--glow-gold), transparent 50%),
     var(--background);
   color: var(--foreground);
   font-family: var(--font-body), "Segoe UI", sans-serif;
@@ -147,8 +178,8 @@ h3,
 
 .site-header {
   isolation: isolate;
-  border-bottom: 1px solid rgba(197, 221, 208, 0.7);
-  background: rgba(255, 255, 255, 0.62);
+  border-bottom: 1px solid var(--header-line);
+  background: var(--header-glass);
   box-shadow: 0 8px 28px rgba(10, 77, 44, 0.05);
   backdrop-filter: blur(18px) saturate(1.25);
 }
@@ -191,7 +222,7 @@ h3,
   background: linear-gradient(
     105deg,
     transparent 18%,
-    rgba(255, 255, 255, 0.28) 42%,
+    var(--sheen) 42%,
     transparent 62%
   );
   background-size: 220% 100%;
@@ -233,9 +264,9 @@ h3,
 .feature-card {
   position: relative;
   overflow: hidden;
-  border: 1px solid rgba(197, 221, 208, 0.85);
+  border: 1px solid var(--card-border);
   border-radius: 1.25rem;
-  background: rgba(255, 255, 255, 0.86);
+  background: var(--card-fill);
   padding: 1.5rem;
   box-shadow: 0 18px 50px rgba(10, 77, 44, 0.07);
   backdrop-filter: blur(8px);
@@ -279,6 +310,10 @@ h3,
   border: 1.5px solid rgba(196, 163, 90, 0.38);
   background: rgba(196, 163, 90, 0.08);
   animation: feature-ring 6.4s ease-in-out infinite;
+}
+
+html.dark .feature-card::after {
+  background: radial-gradient(circle at 35% 35%, rgba(110, 212, 154, 0.22), rgba(22, 53, 38, 0.9) 42%, rgba(26, 143, 84, 0.18));
 }
 
 .feature-card:nth-child(2)::after,
@@ -350,9 +385,9 @@ h3,
 }
 
 .browse-card {
-  border: 1px solid rgba(197, 221, 208, 0.95);
+  border: 1px solid var(--card-border);
   border-radius: 1.35rem;
-  background: #ffffff;
+  background: var(--surface-elevated);
   box-shadow:
     0 1px 2px rgba(10, 77, 44, 0.04),
     0 18px 44px rgba(10, 77, 44, 0.1);
@@ -381,6 +416,11 @@ h3,
   color: #8ee3b1;
   background: rgba(255, 255, 255, 0.09);
   border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.rich-editor-content,
+.rich-story {
+  color: var(--ink);
 }
 
 .rich-editor-content p,
@@ -440,7 +480,7 @@ h3,
   content: "Share your story here…";
   float: left;
   height: 0;
-  color: #718278;
+  color: var(--ink-muted);
   pointer-events: none;
 }
 

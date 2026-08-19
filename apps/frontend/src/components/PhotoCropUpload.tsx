@@ -126,7 +126,7 @@ export default function PhotoCropUpload({
 
   if (source) {
     return (
-      <div className="overflow-hidden rounded-2xl border border-line bg-white shadow-sm">
+      <div className="overflow-hidden rounded-2xl border border-line bg-surface-elevated shadow-sm">
         <div className="relative h-80 bg-ink">
           <Cropper
             image={source}

@@ -62,7 +62,7 @@ export default function AdminDonationsContent() {
             className={`rounded-full px-4 py-2 text-sm font-medium transition ${
               status === filter.value
                 ? "bg-brand text-white"
-                : "border border-line bg-white text-ink-muted hover:border-brand"
+                : "border border-line bg-surface-elevated text-ink-muted hover:border-brand"
             }`}
           >
             {filter.label}
@@ -72,7 +72,7 @@ export default function AdminDonationsContent() {
 
       {error ? <p className="text-sm text-danger">{error}</p> : null}
 
-      <div className="overflow-hidden rounded-2xl border border-line bg-white shadow-sm">
+      <div className="overflow-hidden rounded-2xl border border-line bg-surface-elevated shadow-sm">
         <div className="overflow-x-auto">
           <table className="min-w-full text-left text-sm">
             <thead className="border-b border-line bg-brand-mist/60 text-xs uppercase tracking-wide text-ink-muted">

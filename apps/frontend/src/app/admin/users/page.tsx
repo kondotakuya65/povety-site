@@ -55,7 +55,7 @@ export default function AdminUsersPage() {
           value={q}
           onChange={(e) => setQ(e.target.value)}
           placeholder="Search phone or email"
-          className="min-w-64 flex-1 rounded-xl border border-line bg-white px-4 py-2.5 outline-none focus:border-brand"
+          className="min-w-64 flex-1 rounded-xl border border-line bg-surface-elevated px-4 py-2.5 outline-none focus:border-brand"
         />
         <button
           type="submit"
@@ -67,7 +67,7 @@ export default function AdminUsersPage() {
 
       {error ? <p className="text-sm text-danger">{error}</p> : null}
 
-      <div className="overflow-hidden rounded-2xl border border-line bg-white shadow-sm">
+      <div className="overflow-hidden rounded-2xl border border-line bg-surface-elevated shadow-sm">
         <div className="overflow-x-auto">
           <table className="min-w-full text-left text-sm">
             <thead className="border-b border-line bg-brand-mist/60 text-xs uppercase tracking-wide text-ink-muted">
@@ -89,7 +89,7 @@ export default function AdminUsersPage() {
                     <span
                       className={`rounded-full px-2.5 py-1 text-xs font-semibold uppercase ${
                         user.role === "admin"
-                          ? "bg-brand-soft text-brand-deep"
+                          ? "bg-brand-soft text-brand"
                           : "bg-surface text-ink-muted"
                       }`}
                     >

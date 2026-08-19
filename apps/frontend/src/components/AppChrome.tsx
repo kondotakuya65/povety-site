@@ -9,7 +9,7 @@ export default function AppChrome({ children }: { children: React.ReactNode }) {
   const isAdmin = pathname.startsWith("/admin");
 
   if (isAdmin) {
-    return <div className="h-dvh overflow-hidden bg-[#f3f7f4]">{children}</div>;
+    return <div className="h-dvh overflow-hidden bg-surface">{children}</div>;
   }
 
   return (

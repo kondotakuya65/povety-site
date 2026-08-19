@@ -152,7 +152,7 @@ export default function AdminMoneyPage() {
             <p className="text-sm text-ink-muted">No payout batches yet.</p>
           ) : (
             batches.map((batch) => (
-              <article key={batch.id} className="rounded-2xl border border-line bg-white p-4 shadow-sm">
+              <article key={batch.id} className="rounded-2xl border border-line bg-surface-elevated p-4 shadow-sm">
                 <p className="font-semibold capitalize text-ink">{statusLabel(batch.status)}</p>
                 <p className="mt-1 text-sm text-ink-muted">{batch.notes}</p>
                 <ul className="mt-3 space-y-2 text-sm">
@@ -181,7 +181,7 @@ export default function AdminMoneyPage() {
             <p className="text-sm text-ink-muted">No refunds yet.</p>
           ) : (
             refunds.map((refund) => (
-              <article key={refund.id} className="rounded-2xl border border-line bg-white p-4 text-sm shadow-sm">
+              <article key={refund.id} className="rounded-2xl border border-line bg-surface-elevated p-4 text-sm shadow-sm">
                 <div className="flex flex-wrap justify-between gap-2">
                   <span className="capitalize text-ink">
                     {statusLabel(refund.reason)} · {statusLabel(refund.status)}

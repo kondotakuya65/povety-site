@@ -120,7 +120,7 @@ export default function AccountPage() {
       <div className="mt-6 grid gap-3 sm:grid-cols-2">
         <Link
           href="/account/help"
-          className="rounded-2xl border border-line bg-white p-5 shadow-sm transition hover:border-brand"
+          className="rounded-2xl border border-line bg-surface-elevated p-5 shadow-sm transition hover:border-brand"
         >
           <p className="font-display text-lg font-semibold text-ink">Help history</p>
           <p className="mt-1 text-sm text-ink-muted">
@@ -129,7 +129,7 @@ export default function AccountPage() {
         </Link>
         <Link
           href="/account/gifts"
-          className="rounded-2xl border border-line bg-white p-5 shadow-sm transition hover:border-brand"
+          className="rounded-2xl border border-line bg-surface-elevated p-5 shadow-sm transition hover:border-brand"
         >
           <p className="font-display text-lg font-semibold text-ink">Gifts sent</p>
           <p className="mt-1 text-sm text-ink-muted">Donation history and held-gift refunds</p>

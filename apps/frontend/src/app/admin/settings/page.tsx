@@ -135,7 +135,7 @@ export default function AdminSettingsPage() {
 
       <form onSubmit={onSubmit} className="space-y-4">
         {ordered.map((item) => (
-          <label key={item.key} className="block rounded-2xl border border-line bg-white p-4 shadow-sm">
+          <label key={item.key} className="block rounded-2xl border border-line bg-surface-elevated p-4 shadow-sm">
             <span className="block text-sm font-semibold text-ink">{item.label}</span>
             <span className="mt-1 block text-sm text-ink-muted">{item.description}</span>
             {item.value_type === "boolean" ? (
@@ -147,7 +147,7 @@ export default function AdminSettingsPage() {
               />
             ) : item.key === "payout_weekday" ? (
               <select
-                className="mt-3 w-full rounded-xl border border-line bg-white px-3 py-2.5 outline-none focus:border-brand"
+                className="mt-3 w-full rounded-xl border border-line bg-surface-elevated px-3 py-2.5 outline-none focus:border-brand"
                 value={String(draft[item.key] ?? "1")}
                 onChange={(e) => setDraft((prev) => ({ ...prev, [item.key]: e.target.value }))}
               >
@@ -159,7 +159,7 @@ export default function AdminSettingsPage() {
               </select>
             ) : item.key === "default_deadline_days" ? (
               <select
-                className="mt-3 w-full rounded-xl border border-line bg-white px-3 py-2.5 outline-none focus:border-brand"
+                className="mt-3 w-full rounded-xl border border-line bg-surface-elevated px-3 py-2.5 outline-none focus:border-brand"
                 value={String(draft[item.key] ?? "30")}
                 onChange={(e) => setDraft((prev) => ({ ...prev, [item.key]: e.target.value }))}
               >
@@ -169,7 +169,7 @@ export default function AdminSettingsPage() {
               </select>
             ) : (
               <input
-                className="mt-3 w-full rounded-xl border border-line bg-white px-3 py-2.5 outline-none focus:border-brand"
+                className="mt-3 w-full rounded-xl border border-line bg-surface-elevated px-3 py-2.5 outline-none focus:border-brand"
                 type={item.value_type === "number" ? "number" : "text"}
                 step={item.key === "platform_fee_percent" ? "0.01" : undefined}
                 value={String(draft[item.key] ?? "")}

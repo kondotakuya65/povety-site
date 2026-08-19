@@ -100,7 +100,7 @@ export default function HelpHistoryPage() {
         {items.map((item) => (
           <article
             key={item.id}
-            className="overflow-hidden rounded-2xl border border-line bg-white shadow-sm"
+            className="overflow-hidden rounded-2xl border border-line bg-surface-elevated shadow-sm"
           >
             <div className="flex flex-col gap-4 p-4 sm:flex-row sm:p-5">
               {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -156,7 +156,7 @@ export default function HelpHistoryPage() {
       </div>
 
       {items.length === 0 ? (
-        <div className="mt-12 rounded-2xl border border-dashed border-line bg-white px-6 py-14 text-center">
+        <div className="mt-12 rounded-2xl border border-dashed border-line bg-surface-elevated px-6 py-14 text-center">
           <p className="font-display text-2xl font-semibold text-ink">No help requests yet</p>
           <p className="mt-2 text-ink-muted">When you publish a need, it will appear here.</p>
           <Link

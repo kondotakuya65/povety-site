@@ -93,7 +93,7 @@ export default function LoginPage() {
             Code sent to <span className="font-medium text-ink">{phone}</span>
           </p>
           {devOtp ? (
-            <p className="border border-line bg-brand-soft px-3 py-2 text-sm text-brand-deep">
+            <p className="border border-line bg-brand-soft px-3 py-2 text-sm text-brand">
               Dev OTP: <strong>{devOtp}</strong>
             </p>
           ) : null}

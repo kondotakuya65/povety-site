@@ -68,7 +68,7 @@ export default function RichTextEditor({ value, onChange }: RichTextEditorProps)
   }
 
   return (
-    <div className="overflow-hidden rounded-xl border border-line bg-white shadow-sm focus-within:border-brand focus-within:ring-2 focus-within:ring-brand/10">
+    <div className="overflow-hidden rounded-xl border border-line bg-surface-elevated shadow-sm focus-within:border-brand focus-within:ring-2 focus-within:ring-brand/10">
       <div className="flex flex-wrap gap-1 border-b border-line bg-brand-mist/70 p-2">
         <ToolButton
           label="P"

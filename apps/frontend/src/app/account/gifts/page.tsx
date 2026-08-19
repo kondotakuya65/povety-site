@@ -81,7 +81,7 @@ export default function GiftHistoryPage() {
       {message ? <p className="mt-6 text-sm text-brand">{message}</p> : null}
 
       {donations.length === 0 ? (
-        <div className="mt-12 rounded-2xl border border-dashed border-line bg-white px-6 py-14 text-center">
+        <div className="mt-12 rounded-2xl border border-dashed border-line bg-surface-elevated px-6 py-14 text-center">
           <p className="font-display text-2xl font-semibold text-ink">No gifts yet</p>
           <p className="mt-2 text-ink-muted">When you send help, it will show up here.</p>
           <Link
@@ -94,7 +94,7 @@ export default function GiftHistoryPage() {
       ) : (
         <ul className="mt-10 space-y-3">
           {donations.map((donation) => (
-            <li key={donation.id} className="rounded-2xl border border-line bg-white p-5 text-sm shadow-sm">
+            <li key={donation.id} className="rounded-2xl border border-line bg-surface-elevated p-5 text-sm shadow-sm">
               <p className="font-medium text-ink">
                 {donation.help_request?.full_name ?? "Help request"}
               </p>

@@ -59,12 +59,12 @@ export default function BrowseRequestsPage() {
                   alt={item.full_name}
                   className="aspect-[4/3] w-full object-cover transition duration-500 group-hover:scale-[1.04]"
                 />
-                <span className="absolute left-3 top-3 rounded-full bg-white/95 px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-brand shadow-sm backdrop-blur">
+                <span className="absolute left-3 top-3 rounded-full bg-surface-elevated/95 px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-brand shadow-sm backdrop-blur">
                   {statusLabel(item.status)}
                 </span>
               </div>
 
-              <div className="flex flex-1 flex-col border-t border-line/80 bg-white p-5 sm:p-6">
+              <div className="flex flex-1 flex-col border-t border-line/80 bg-surface-elevated p-5 sm:p-6">
                 <h2 className="font-display text-2xl font-semibold text-ink transition group-hover:text-brand">
                   {item.full_name}
                 </h2>
@@ -107,7 +107,7 @@ export default function BrowseRequestsPage() {
       </div>
 
       {!error && items.length === 0 ? (
-        <div className="mt-12 rounded-2xl border border-dashed border-line bg-white/70 px-6 py-14 text-center">
+        <div className="mt-12 rounded-2xl border border-dashed border-line bg-surface-elevated/70 px-6 py-14 text-center">
           <p className="font-display text-2xl font-semibold text-ink">No live requests yet</p>
           <p className="mt-2 text-ink-muted">Check back soon, or be the first to request help.</p>
           <Link

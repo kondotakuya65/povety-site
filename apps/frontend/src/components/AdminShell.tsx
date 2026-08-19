@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import BrandLogo from "@/components/BrandLogo";
+import ThemeToggle from "@/components/ThemeToggle";
 import { api } from "@/lib/api";
 import { AuthUser, clearSession, getToken, isAdmin } from "@/lib/auth";
 
@@ -62,7 +63,7 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
             className={`rounded-xl px-3 py-2.5 text-sm font-medium transition ${
               active
                 ? "bg-brand text-white shadow-sm"
-                : "text-ink-muted hover:bg-brand-soft hover:text-brand-deep"
+                : "text-ink-muted hover:bg-brand-soft hover:text-brand"
             }`}
           >
             {item.label}
@@ -91,7 +92,7 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
 
   return (
     <div className="flex h-full min-h-0 lg:grid lg:grid-cols-[260px_1fr]">
-      <aside className="hidden h-full min-h-0 border-r border-line bg-white lg:flex lg:flex-col">
+      <aside className="hidden h-full min-h-0 border-r border-line bg-surface-elevated lg:flex lg:flex-col">
         <div className="shrink-0 border-b border-line px-5 py-5">
           <BrandLogo size={34} />
           <p className="mt-2 text-xs font-semibold uppercase tracking-[0.14em] text-brand-mid">
@@ -111,7 +112,7 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
       </aside>
 
       <div className="flex min-h-0 min-w-0 flex-1 flex-col">
-        <header className="flex shrink-0 items-center justify-between border-b border-line bg-white/95 px-4 py-3 backdrop-blur lg:px-8">
+        <header className="flex shrink-0 items-center justify-between border-b border-line bg-surface-elevated/95 px-4 py-3 backdrop-blur lg:px-8">
           <div className="flex items-center gap-3 lg:hidden">
             <button
               type="button"
@@ -120,16 +121,19 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
             >
               {open ? "Close" : "Menu"}
             </button>
-            <span className="font-display text-lg font-semibold text-brand-deep">Admin</span>
+            <span className="font-display text-lg font-semibold text-ink">Admin</span>
           </div>
           <p className="hidden text-sm text-ink-muted lg:block">Prosperax operations</p>
-          <Link href="/" className="text-sm font-medium text-brand hover:underline lg:hidden">
-            Site
-          </Link>
+          <div className="flex items-center gap-3">
+            <ThemeToggle />
+            <Link href="/" className="text-sm font-medium text-brand hover:underline lg:hidden">
+              Site
+            </Link>
+          </div>
         </header>
 
         {open ? (
-          <div className="shrink-0 border-b border-line bg-white lg:hidden">{nav}</div>
+          <div className="shrink-0 border-b border-line bg-surface-elevated lg:hidden">{nav}</div>
         ) : null}
 
         <div className="min-h-0 flex-1 overflow-y-auto px-4 py-8 sm:px-6 lg:px-8">{children}</div>

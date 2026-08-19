@@ -71,7 +71,7 @@ export default function AdminOverviewPage() {
           <Link
             key={card.label}
             href={card.href}
-            className="rounded-2xl border border-line bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:border-brand hover:shadow-md"
+            className="rounded-2xl border border-line bg-surface-elevated p-5 shadow-sm transition hover:-translate-y-0.5 hover:border-brand hover:shadow-md"
           >
             <p className="text-sm text-ink-muted">{card.label}</p>
             <p className="font-display mt-2 text-3xl font-semibold text-brand">{card.value}</p>
@@ -80,7 +80,7 @@ export default function AdminOverviewPage() {
       </div>
 
       <div className="grid gap-6 lg:grid-cols-2">
-        <section className="rounded-2xl border border-line bg-white p-5 shadow-sm">
+        <section className="rounded-2xl border border-line bg-surface-elevated p-5 shadow-sm">
           <div className="mb-4 flex items-center justify-between">
             <h2 className="font-display text-xl font-semibold text-ink">Recent requests</h2>
             <Link href="/admin/requests" className="text-sm font-medium text-brand hover:underline">
@@ -107,7 +107,7 @@ export default function AdminOverviewPage() {
           </ul>
         </section>
 
-        <section className="rounded-2xl border border-line bg-white p-5 shadow-sm">
+        <section className="rounded-2xl border border-line bg-surface-elevated p-5 shadow-sm">
           <h2 className="font-display text-xl font-semibold text-ink">Recent activity</h2>
           <ul className="mt-4 space-y-3">
             {data.recent_audit.map((item) => (

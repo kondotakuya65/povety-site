@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import BrandLogo from "@/components/BrandLogo";
+import ThemeToggle from "@/components/ThemeToggle";
 import { api } from "@/lib/api";
 import { AUTH_EVENT, AuthUser, TOKEN_KEY, clearSession, getToken, isAdmin } from "@/lib/auth";
 
@@ -113,14 +114,16 @@ export default function SiteHeader() {
         <Link href="/" className="transition hover:opacity-90" aria-label="Prosperax home">
           <BrandLogo size={36} />
         </Link>
-        <nav className="hidden items-center gap-5 text-sm font-medium md:flex">{navLinks}</nav>
-        <button
-          type="button"
-          className="flex h-10 w-10 items-center justify-center rounded-full border border-line text-brand md:hidden"
-          aria-expanded={open}
-          aria-controls="mobile-nav"
-          onClick={() => setOpen((v) => !v)}
-        >
+        <div className="flex items-center gap-2 sm:gap-3">
+          <nav className="hidden items-center gap-5 text-sm font-medium md:flex">{navLinks}</nav>
+          <ThemeToggle />
+          <button
+            type="button"
+            className="flex h-10 w-10 items-center justify-center rounded-full border border-line text-brand md:hidden"
+            aria-expanded={open}
+            aria-controls="mobile-nav"
+            onClick={() => setOpen((v) => !v)}
+          >
           <span className="sr-only">{open ? "Close menu" : "Open menu"}</span>
           {open ? (
             <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5" stroke="currentColor" strokeWidth="2" aria-hidden="true">
@@ -131,7 +134,8 @@ export default function SiteHeader() {
               <path d="M4 7h16M4 12h16M4 17h16" />
             </svg>
           )}
-        </button>
+          </button>
+        </div>
       </div>
       {open ? (
         <nav

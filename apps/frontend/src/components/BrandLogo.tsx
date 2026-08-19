@@ -19,7 +19,7 @@ export default function BrandLogo({
   const wordClass =
     tone === "dark"
       ? "font-display font-semibold tracking-tight text-white"
-      : "font-display font-semibold tracking-tight text-brand-deep";
+      : "font-display font-semibold tracking-tight text-ink";
 
   return (
     <span className={`inline-flex items-center gap-2.5 ${className}`}>

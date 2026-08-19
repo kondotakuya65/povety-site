@@ -82,7 +82,7 @@ export default function CreateHelpRequestPage() {
       </p>
 
       <form onSubmit={onSubmit} className="mt-10 space-y-8">
-        <section className="space-y-5 rounded-2xl border border-line bg-white p-5 shadow-sm sm:p-6">
+        <section className="space-y-5 rounded-2xl border border-line bg-surface-elevated p-5 shadow-sm sm:p-6">
           <div>
             <p className="text-xs font-bold uppercase tracking-[0.16em] text-brand-mid">Your request</p>
             <h2 className="font-display mt-1 text-2xl font-semibold text-ink">Tell people who you are</h2>
@@ -126,7 +126,7 @@ export default function CreateHelpRequestPage() {
           </div>
         </section>
 
-        <section className="space-y-5 rounded-2xl border border-line bg-white p-5 shadow-sm sm:p-6">
+        <section className="space-y-5 rounded-2xl border border-line bg-surface-elevated p-5 shadow-sm sm:p-6">
           <div>
             <p className="text-xs font-bold uppercase tracking-[0.16em] text-brand-mid">Goal</p>
             <h2 className="font-display mt-1 text-2xl font-semibold text-ink">How much help do you need?</h2>
@@ -158,7 +158,7 @@ export default function CreateHelpRequestPage() {
           </div>
         </section>
 
-        <fieldset className="space-y-4 rounded-2xl border border-line bg-white p-5 shadow-sm sm:p-6">
+        <fieldset className="space-y-4 rounded-2xl border border-line bg-surface-elevated p-5 shadow-sm sm:p-6">
           <legend className="px-2 font-display text-xl font-semibold text-ink">Verification</legend>
           <div className="flex gap-4 text-sm">
             <label className="flex items-center gap-2">
@@ -196,7 +196,7 @@ export default function CreateHelpRequestPage() {
           )}
         </fieldset>
 
-        <fieldset className="space-y-3 rounded-2xl border border-line bg-white p-5 shadow-sm sm:p-6">
+        <fieldset className="space-y-3 rounded-2xl border border-line bg-surface-elevated p-5 shadow-sm sm:p-6">
           <legend className="px-2 font-display text-xl font-semibold text-ink">Payout bank details</legend>
           <p className="text-sm text-ink-muted">Required before admin approval and weekly payout.</p>
           <input

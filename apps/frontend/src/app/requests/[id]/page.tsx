@@ -150,7 +150,7 @@ export default function RequestDetailPage() {
               <input
                 type="number"
                 min={minDonation}
-                className="mt-2 w-full border border-line bg-white px-3 py-2.5 outline-none focus:border-brand"
+                className="mt-2 w-full border border-line bg-surface-elevated px-3 py-2.5 outline-none focus:border-brand"
                 value={amount}
                 onChange={(e) => setAmount(e.target.value)}
                 required
@@ -160,7 +160,7 @@ export default function RequestDetailPage() {
               Receipt email (optional if already saved on account)
               <input
                 type="email"
-                className="mt-2 w-full border border-line bg-white px-3 py-2.5 outline-none focus:border-brand"
+                className="mt-2 w-full border border-line bg-surface-elevated px-3 py-2.5 outline-none focus:border-brand"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="you@example.com"
