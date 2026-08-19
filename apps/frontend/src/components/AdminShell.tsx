@@ -74,30 +74,32 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
 
   if (error) {
     return (
-      <div className="mx-auto max-w-lg px-4 py-24 text-center">
-        <p className="text-danger">{error}</p>
-        <Link href="/" className="mt-4 inline-block text-brand hover:underline">
-          Back to site
-        </Link>
+      <div className="flex h-full items-center justify-center px-4 text-center">
+        <div>
+          <p className="text-danger">{error}</p>
+          <Link href="/" className="mt-4 inline-block text-brand hover:underline">
+            Back to site
+          </Link>
+        </div>
       </div>
     );
   }
 
   if (!user) {
-    return <div className="px-6 py-16 text-ink-muted">Loading admin…</div>;
+    return <div className="flex h-full items-center px-6 text-ink-muted">Loading admin…</div>;
   }
 
   return (
-    <div className="min-h-screen lg:grid lg:grid-cols-[260px_1fr]">
-      <aside className="hidden border-r border-line bg-white lg:flex lg:flex-col">
-        <div className="border-b border-line px-5 py-5">
+    <div className="flex h-full min-h-0 lg:grid lg:grid-cols-[260px_1fr]">
+      <aside className="hidden h-full min-h-0 border-r border-line bg-white lg:flex lg:flex-col">
+        <div className="shrink-0 border-b border-line px-5 py-5">
           <BrandLogo size={34} />
           <p className="mt-2 text-xs font-semibold uppercase tracking-[0.14em] text-brand-mid">
             Admin console
           </p>
         </div>
-        {nav}
-        <div className="mt-auto space-y-2 border-t border-line p-4 text-sm">
+        <div className="min-h-0 flex-1 overflow-y-auto">{nav}</div>
+        <div className="shrink-0 space-y-2 border-t border-line p-4 text-sm">
           <p className="truncate text-ink-muted">{user.phone}</p>
           <Link href="/" className="block text-brand hover:underline">
             View site
@@ -108,8 +110,8 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
         </div>
       </aside>
 
-      <div className="min-w-0">
-        <header className="sticky top-0 z-30 flex items-center justify-between border-b border-line bg-white/95 px-4 py-3 backdrop-blur lg:px-8">
+      <div className="flex min-h-0 min-w-0 flex-1 flex-col">
+        <header className="flex shrink-0 items-center justify-between border-b border-line bg-white/95 px-4 py-3 backdrop-blur lg:px-8">
           <div className="flex items-center gap-3 lg:hidden">
             <button
               type="button"
@@ -127,10 +129,10 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
         </header>
 
         {open ? (
-          <div className="border-b border-line bg-white lg:hidden">{nav}</div>
+          <div className="shrink-0 border-b border-line bg-white lg:hidden">{nav}</div>
         ) : null}
 
-        <div className="px-4 py-8 sm:px-6 lg:px-8">{children}</div>
+        <div className="min-h-0 flex-1 overflow-y-auto px-4 py-8 sm:px-6 lg:px-8">{children}</div>
       </div>
     </div>
   );
