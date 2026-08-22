@@ -192,6 +192,23 @@ nano .env
 
 ### Recommended production `.env`
 
+**Important — password special characters:**  
+Postgres can store passwords with `@ * ) # %` etc., but in `DATABASE_URL` those characters must be **URL-encoded**, or Alembic/SQLAlchemy will mis-parse the URL (often fails at `alembic upgrade head`).
+
+Encode the password before pasting it into `.env`:
+
+```bash
+python3 -c "from urllib.parse import quote_plus; print(quote_plus('YOUR_RAW_PASSWORD'))"
+```
+
+Example: raw password `pro_password2026)*@@` encodes to `pro_password2026%29%2A%40%40`, so:
+
+```env
+DATABASE_URL=postgresql+psycopg://prosperax:pro_password2026%29%2A%40%40@127.0.0.1:5432/prosperax
+```
+
+Common encodings: `@` → `%40` · `*` → `%2A` · `)` → `%29` · `#` → `%23` · `%` → `%25` · `/` → `%2F`
+
 ```env
 ENVIRONMENT=production
 CORS_ORIGINS=https://prosperax.online,https://www.prosperax.online
