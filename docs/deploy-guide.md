@@ -209,6 +209,8 @@ DATABASE_URL=postgresql+psycopg://prosperax:pro_password2026%29%2A%40%40@127.0.0
 
 Common encodings: `@` → `%40` · `*` → `%2A` · `)` → `%29` · `#` → `%23` · `%` → `%25` · `/` → `%2F`
 
+Keep the encoded form in `.env`. Alembic is configured to accept `%` in the URL (ConfigParser escape is handled in `alembic/env.py`).
+
 ```env
 ENVIRONMENT=production
 CORS_ORIGINS=https://prosperax.online,https://www.prosperax.online

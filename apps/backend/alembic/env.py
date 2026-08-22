@@ -8,7 +8,8 @@ from app.core.database import Base
 from app.models import *  # noqa: F403
 
 config = context.config
-config.set_main_option("sqlalchemy.url", settings.database_url)
+# ConfigParser treats "%" as interpolation — escape so URL-encoded passwords work.
+config.set_main_option("sqlalchemy.url", settings.database_url.replace("%", "%%"))
 
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
@@ -17,9 +18,8 @@ target_metadata = Base.metadata
 
 
 def run_migrations_offline() -> None:
-    url = config.get_main_option("sqlalchemy.url")
     context.configure(
-        url=url,
+        url=settings.database_url,
         target_metadata=target_metadata,
         literal_binds=True,
         dialect_opts={"paramstyle": "named"},
@@ -31,8 +31,10 @@ def run_migrations_offline() -> None:
 
 
 def run_migrations_online() -> None:
+    section = config.get_section(config.config_ini_section, {}) or {}
+    section["sqlalchemy.url"] = settings.database_url
     connectable = engine_from_config(
-        config.get_section(config.config_ini_section, {}),
+        section,
         prefix="sqlalchemy.",
         poolclass=pool.NullPool,
     )
