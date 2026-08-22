@@ -135,8 +135,8 @@ python -m app.scripts.money_jobs refunds   # daily
 Example VPS cron:
 
 ```cron
-0 9 * * 1 cd /var/www/prosperax/apps/backend && .venv/bin/python -m app.scripts.money_jobs payouts
-0 2 * * * cd /var/www/prosperax/apps/backend && .venv/bin/python -m app.scripts.money_jobs refunds
+0 9 * * 1 cd /var/www/povety-site/apps/backend && .venv/bin/python -m app.scripts.money_jobs payouts
+0 2 * * * cd /var/www/povety-site/apps/backend && .venv/bin/python -m app.scripts.money_jobs refunds
 ```
 
 Next: Phase 7 — email notices (`docs/implementation-steps.md`).

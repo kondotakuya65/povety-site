@@ -6,20 +6,22 @@ Target stack:
 
 | Piece | Role |
 |---|---|
-| Hostinger domain `prosperax.online` | DNS A records → VPS |
+| Hostinger domain `prosperax.online` | DNS A records to VPS |
 | Hostinger VPS · Ubuntu 24.04 | App host |
 | Nginx | HTTPS reverse proxy |
 | PM2 | Keep frontend + backend running |
 | PostgreSQL | Database on the VPS |
-| Let’s Encrypt (certbot) | TLS certificates |
+| Let's Encrypt (certbot) | TLS certificates |
 
-App layout on the server:
+App layout on the server (repo folder = **`povety-site`**):
 
 ```text
-/var/www/prosperax/
+/var/www/povety-site/
   apps/frontend/     # Next.js (:3000)
   apps/backend/      # FastAPI/uvicorn (:8000)
   apps/backend/uploads/
+  ecosystem.config.cjs      # production PM2
+  ecosystem.dev.config.cjs  # development PM2 (reload)
 ```
 
 Public URLs:
@@ -37,7 +39,7 @@ Have ready:
 
 1. Hostinger VPS SSH access (root, or a sudo user — Hostinger usually gives root + IP)
 2. Domain **prosperax.online** in Hostinger (Domains / DNS)
-3. Git repo URL (GitHub/GitLab) the VPS can clone
+3. Git repo URL for **`povety-site`** (GitHub/GitLab) the VPS can clone
 4. Production secrets:
    - strong `JWT_SECRET`
    - Paystack **test** keys first (live keys in Phase 9)
@@ -66,7 +68,7 @@ In Hostinger → **Domains** → `prosperax.online` → **DNS / DNS Zone**:
 
 Notes:
 
-- If Hostinger already added parking / “Coming soon” A/CNAME records for `@` or `www`, **edit or delete** them so only your VPS IP remains.
+- If Hostinger already added parking / "Coming soon" A/CNAME records for `@` or `www`, **edit or delete** them so only your VPS IP remains.
 - You do **not** need Hostinger shared hosting for this site — DNS only on Hostinger, app on the VPS.
 - Optional later: redirect `www` → apex in Nginx after HTTPS works.
 
@@ -108,7 +110,7 @@ sudo ufw enable
 sudo ufw status
 ```
 
-Also confirm Hostinger’s **VPS firewall / security** (if shown in hPanel) allows **22, 80, 443**. Do not open Postgres or app ports publicly.
+Also confirm Hostinger's **VPS firewall / security** (if shown in hPanel) allows **22, 80, 443**. Do not open Postgres or app ports publicly.
 
 ### Node.js 20
 
@@ -161,19 +163,23 @@ sudo -u postgres psql -d prosperax -c "GRANT ALL ON SCHEMA public TO prosperax;"
 
 ## 3. Clone the repo
 
+Clone into **`/var/www/povety-site`** (same name as the Git repo):
+
 ```bash
 sudo mkdir -p /var/www
 sudo chown -R $USER:$USER /var/www
 cd /var/www
-git clone YOUR_REPO_URL prosperax
-cd prosperax
+git clone YOUR_REPO_URL povety-site
+# or, if the remote already ends with povety-site.git:
+# git clone YOUR_REPO_URL
+cd povety-site
 ```
 
 Create uploads dir:
 
 ```bash
-mkdir -p /var/www/prosperax/apps/backend/uploads
-chmod 755 /var/www/prosperax/apps/backend/uploads
+mkdir -p /var/www/povety-site/apps/backend/uploads
+chmod 755 /var/www/povety-site/apps/backend/uploads
 ```
 
 ---
@@ -181,7 +187,7 @@ chmod 755 /var/www/prosperax/apps/backend/uploads
 ## 4. Backend production env
 
 ```bash
-cd /var/www/prosperax/apps/backend
+cd /var/www/povety-site/apps/backend
 python3 -m venv .venv
 source .venv/bin/activate
 pip install --upgrade pip
@@ -215,7 +221,7 @@ Keep the encoded form in `.env`. Alembic is configured to accept `%` in the URL 
 ENVIRONMENT=production
 CORS_ORIGINS=https://prosperax.online,https://www.prosperax.online
 DATABASE_URL=postgresql+psycopg://prosperax:CHANGE_ME_STRONG_PASSWORD@127.0.0.1:5432/prosperax
-UPLOAD_DIR=/var/www/prosperax/apps/backend/uploads
+UPLOAD_DIR=/var/www/povety-site/apps/backend/uploads
 
 ADMIN_PHONE=+2348XXXXXXXXX
 ADMIN_PHONES=
@@ -257,7 +263,7 @@ openssl rand -hex 32
 ### Migrate + seed
 
 ```bash
-cd /var/www/prosperax/apps/backend
+cd /var/www/povety-site/apps/backend
 source .venv/bin/activate
 alembic upgrade head
 python -m app.scripts.seed
@@ -277,11 +283,11 @@ curl http://127.0.0.1:8000/api/health
 ## 5. Frontend production build
 
 ```bash
-cd /var/www/prosperax/apps/frontend
+cd /var/www/povety-site/apps/frontend
 npm ci
 ```
 
-Create `/var/www/prosperax/apps/frontend/.env.production` (or `.env.local` used at build/start):
+Create `/var/www/povety-site/apps/frontend/.env.production` (or `.env.local` used at build/start):
 
 ```env
 BACKEND_URL=http://127.0.0.1:8000
@@ -302,43 +308,23 @@ Notes:
 
 ---
 
-## 6. PM2 process file
+## 6. PM2 process files (production + development)
 
-Create `/var/www/prosperax/ecosystem.config.cjs`:
+The repo includes both configs at the project root:
 
-```js
-module.exports = {
-  apps: [
-    {
-      name: "prosperax-backend",
-      cwd: "/var/www/prosperax/apps/backend",
-      script: ".venv/bin/uvicorn",
-      args: "app.main:app --host 127.0.0.1 --port 8000",
-      interpreter: "none",
-      env: {
-        ENVIRONMENT: "production",
-      },
-    },
-    {
-      name: "prosperax-frontend",
-      cwd: "/var/www/prosperax/apps/frontend",
-      script: "node_modules/next/dist/bin/next",
-      args: "start -p 3000 -H 127.0.0.1",
-      interpreter: "none",
-      env: {
-        NODE_ENV: "production",
-        BACKEND_URL: "http://127.0.0.1:8000",
-        NEXT_PUBLIC_SITE_URL: "https://prosperax.online",
-      },
-    },
-  ],
-};
-```
+| File | Mode | What it runs |
+|---|---|---|
+| `ecosystem.config.cjs` | **production** | `uvicorn` (no reload) + `next start` |
+| `ecosystem.dev.config.cjs` | **development** | `uvicorn --reload` + `next dev` |
 
-Start + persist:
+Do **not** start both configs at once — they share ports `8000` and `3000`.
+
+### 6a. Production (public site)
+
+Configs are already in the repo after `git pull`. Start them:
 
 ```bash
-cd /var/www/prosperax
+cd /var/www/povety-site
 pm2 start ecosystem.config.cjs
 pm2 status
 pm2 logs
@@ -347,11 +333,92 @@ pm2 startup
 pm2 save
 ```
 
+Production apps:
+
+- `prosperax-backend` → FastAPI on `127.0.0.1:8000`
+- `prosperax-frontend` → Next.js production server on `127.0.0.1:3000`
+
 Checks:
 
 ```bash
 curl http://127.0.0.1:8000/api/health
 curl -I http://127.0.0.1:3000
+```
+
+Restart after deploys:
+
+```bash
+cd /var/www/povety-site
+pm2 restart prosperax-backend prosperax-frontend
+```
+
+### 6b. Development (hot reload on the VPS)
+
+Use this when you want live code reload on the server (debugging, staging). Nginx can still proxy to the same ports.
+
+1. Stop production processes first (if running):
+
+```bash
+pm2 stop prosperax-backend prosperax-frontend
+# or fully remove them from PM2:
+# pm2 delete prosperax-backend prosperax-frontend
+```
+
+2. Ensure frontend deps exist (dev uses `next dev`, no production build required):
+
+```bash
+cd /var/www/povety-site/apps/frontend
+npm ci
+```
+
+3. Optional: set frontend env for local/dev browsing via IP or HTTP:
+
+```bash
+# apps/frontend/.env.local
+BACKEND_URL=http://127.0.0.1:8000
+NEXT_PUBLIC_SITE_URL=https://prosperax.online
+```
+
+4. Start the **dev** PM2 file:
+
+```bash
+cd /var/www/povety-site
+pm2 start ecosystem.dev.config.cjs
+pm2 status
+pm2 logs prosperax-backend-dev
+pm2 logs prosperax-frontend-dev
+```
+
+Dev apps:
+
+- `prosperax-backend-dev` → `uvicorn ... --reload`
+- `prosperax-frontend-dev` → `next dev -p 3000`
+
+5. Switch back to production later:
+
+```bash
+pm2 stop prosperax-backend-dev prosperax-frontend-dev
+pm2 delete prosperax-backend-dev prosperax-frontend-dev
+
+cd /var/www/povety-site/apps/frontend
+npm run build
+
+cd /var/www/povety-site
+pm2 start ecosystem.config.cjs
+# or, if production apps still exist stopped:
+# pm2 restart prosperax-backend prosperax-frontend
+pm2 save
+```
+
+### 6c. Useful PM2 commands
+
+```bash
+pm2 status
+pm2 logs --lines 80
+pm2 restart all
+pm2 stop all
+pm2 delete all
+pm2 save
 ```
 
 ---
@@ -415,7 +482,7 @@ Visit `http://prosperax.online` (HTTP first). DNS must already point at this VPS
 
 ---
 
-## 8. HTTPS with Let’s Encrypt
+## 8. HTTPS with Let's Encrypt
 
 ```bash
 sudo certbot --nginx -d prosperax.online -d www.prosperax.online
@@ -431,7 +498,7 @@ curl -I https://prosperax.online
 curl https://prosperax.online/api/health
 ```
 
-If certbot fails with “connection refused / timeout”, check Hostinger firewall + UFW, and that A records hit this VPS.
+If certbot fails with "connection refused / timeout", check Hostinger firewall + UFW, and that A records hit this VPS.
 
 ---
 
@@ -447,10 +514,10 @@ Add:
 
 ```cron
 # Weekly payouts — Mondays 09:00 Lagos (WAT = UTC+1)
-0 8 * * 1 cd /var/www/prosperax/apps/backend && .venv/bin/python -m app.scripts.money_jobs payouts >> /var/log/prosperax-payouts.log 2>&1
+0 8 * * 1 cd /var/www/povety-site/apps/backend && .venv/bin/python -m app.scripts.money_jobs payouts >> /var/log/prosperax-payouts.log 2>&1
 
 # Daily unmet-goal / deadline refund sweep — 02:00 Lagos
-0 1 * * * cd /var/www/prosperax/apps/backend && .venv/bin/python -m app.scripts.money_jobs refunds >> /var/log/prosperax-refunds.log 2>&1
+0 1 * * * cd /var/www/povety-site/apps/backend && .venv/bin/python -m app.scripts.money_jobs refunds >> /var/log/prosperax-refunds.log 2>&1
 ```
 
 Create log files once:
@@ -463,7 +530,7 @@ sudo chown $USER:$USER /var/log/prosperax-payouts.log /var/log/prosperax-refunds
 Manual test:
 
 ```bash
-cd /var/www/prosperax/apps/backend
+cd /var/www/povety-site/apps/backend
 source .venv/bin/activate
 python -m app.scripts.money_jobs payouts
 python -m app.scripts.money_jobs refunds
@@ -513,7 +580,7 @@ Keep `PAYSTACK_MOCK=false` and use **test keys** until Phase 9 go-live.
 After code changes:
 
 ```bash
-cd /var/www/prosperax
+cd /var/www/povety-site
 git pull
 
 # Backend deps + migrations
@@ -522,17 +589,19 @@ source .venv/bin/activate
 pip install -r requirements.txt
 alembic upgrade head
 
-# Frontend build
+# Frontend build (production mode)
 cd ../frontend
 npm ci
 npm run build
 
-# Restart processes
-cd /var/www/prosperax
+# Restart production PM2 apps
+cd /var/www/povety-site
 pm2 restart prosperax-backend prosperax-frontend
 pm2 status
 pm2 logs --lines 80
 ```
+
+If you were on **dev** PM2, switch back to production with section **6b** step 5 instead.
 
 Health checks:
 
@@ -562,7 +631,7 @@ You may need a `~/.pgpass` file so cron can authenticate non-interactively.
 
 ```bash
 # simple daily copy (replace with rsync/offsite later)
-15 3 * * * tar -czf /var/backups/prosperax/uploads-$(date +\%F).tar.gz -C /var/www/prosperax/apps/backend uploads
+15 3 * * * tar -czf /var/backups/prosperax/uploads-$(date +\%F).tar.gz -C /var/www/povety-site/apps/backend uploads
 ```
 
 Keep at least 7–14 days of backups. Prefer copying dumps off the VPS (Hostinger object storage, another machine, or download periodically).
@@ -576,7 +645,7 @@ Keep at least 7–14 days of backups. Prefer copying dumps off the VPS (Hostinge
 - Hostinger may show a separate **firewall** UI — allow SSH (22), HTTP (80), HTTPS (443) there as well as with `ufw`.
 - Optional Hostinger email mailbox (`support@prosperax.online`) is fine for human replies; app transactional mail should still use SMTP later (Brevo/SendGrid/SES) for better deliverability.
 - Open ports **22 / 80 / 443** only. Do **not** expose Postgres (`5432`) or app ports (`3000`/`8000`) publicly.
-- If you use Hostinger’s panel “one-click apps”, skip them for Prosperax — this guide’s Nginx + PM2 layout is the source of truth.
+- If you use Hostinger's panel "one-click apps", skip them for Prosperax — this guide's Nginx + PM2 layout is the source of truth.
 
 ---
 
@@ -594,6 +663,7 @@ Keep at least 7–14 days of backups. Prefer copying dumps off the VPS (Hostinge
 | Paystack webhook failures | public HTTPS URL, signature secret key, Nginx `/api/` proxy |
 | Admin forbidden | phone normalized and listed in `ADMIN_PHONE(S)` |
 | After deploy old UI | hard refresh; confirm `npm run build` + frontend PM2 restart |
+| Port already in use | stop the other PM2 mode (`prod` vs `dev`) before starting |
 
 Useful commands:
 
@@ -601,6 +671,8 @@ Useful commands:
 pm2 status
 pm2 logs prosperax-backend --lines 100
 pm2 logs prosperax-frontend --lines 100
+pm2 logs prosperax-backend-dev --lines 100
+pm2 logs prosperax-frontend-dev --lines 100
 sudo journalctl -u nginx -n 100 --no-pager
 sudo tail -f /var/log/nginx/error.log
 ```
@@ -617,6 +689,7 @@ sudo tail -f /var/log/nginx/error.log
 - [ ] Paystack still on **test** keys until Phase 9
 - [ ] Admin phone(s) verified
 - [ ] Backups scheduled
+- [ ] Public traffic uses **production** PM2 (`ecosystem.config.cjs`), not `--reload` / `next dev`
 
 ---
 
