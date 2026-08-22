@@ -156,9 +156,9 @@ Work top to bottom. Check off each step when done. Do not skip money/webhook ste
 
 ## Phase 8 — VPS deploy (Nginx + PM2)
 
-Full walkthrough: **[`docs/deploy-guide.md`](./deploy-guide.md)** (GoDaddy DNS + Ubuntu VPS + Nginx + PM2 + TLS + cron + Paystack webhook).
+Full walkthrough: **[`docs/deploy-guide.md`](./deploy-guide.md)** (Hostinger DNS + Ubuntu 24 VPS + Nginx + PM2 + TLS + cron + Paystack webhook).
 
-1. [ ] Provision Linux VPS; point `prosperax.org` A-record
+1. [ ] Provision Hostinger Ubuntu 24 VPS; point `prosperax.online` A-record
 2. [ ] Install: Node, Python, PostgreSQL, Nginx, certbot, PM2, git
 3. [ ] Create DB user/db; set `UPLOAD_DIR` permissions
 4. [ ] Clone repo; production `.env` (Paystack, SMS, SMTP, secrets)
@@ -173,7 +173,7 @@ Full walkthrough: **[`docs/deploy-guide.md`](./deploy-guide.md)** (GoDaddy DNS +
    - `/media/` → uploads directory
    - TLS via Let’s Encrypt
 9. [ ] Cron on VPS: weekly payout trigger + daily deadline/refund sweep (hit admin job endpoints or CLI)
-10. [ ] Confirm Paystack webhook URL: `https://prosperax.org/api/webhooks/paystack`
+10. [ ] Confirm Paystack webhook URL: `https://prosperax.online/api/webhooks/paystack`
 11. [ ] Deploy runbook: `git pull` → migrate → build → `pm2 restart prosperax-frontend prosperax-backend`
 
 **Exit:** site live on HTTPS; PM2 processes stable; webhook reachable.

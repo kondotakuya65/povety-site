@@ -174,7 +174,7 @@ SMS OTP stays on Termii (`SMS_PROVIDER=termii`).
 
 ## Deploy (Phase 8)
 
-Production walkthrough for GoDaddy DNS + Linux VPS:
+Production walkthrough for Hostinger DNS (`prosperax.online`) + Ubuntu 24 VPS:
 
 → **[`docs/deploy-guide.md`](docs/deploy-guide.md)**
 

@@ -1,16 +1,16 @@
 # Prosperax deploy guide (Phase 8)
 
-Step-by-step guide to run **prosperax.org** on a Linux VPS with **Nginx + PM2 + PostgreSQL**.
+Step-by-step guide to run **prosperax.online** on a **Hostinger VPS (Ubuntu 24.04)** with **Nginx + PM2 + PostgreSQL**.
 
 Target stack:
 
 | Piece | Role |
 |---|---|
-| GoDaddy domain | DNS for `prosperax.org` |
-| Linux VPS (Ubuntu 22.04/24.04 recommended) | App host |
+| Hostinger domain `prosperax.online` | DNS A records → VPS |
+| Hostinger VPS · Ubuntu 24.04 | App host |
 | Nginx | HTTPS reverse proxy |
 | PM2 | Keep frontend + backend running |
-| PostgreSQL | Database |
+| PostgreSQL | Database on the VPS |
 | Let’s Encrypt (certbot) | TLS certificates |
 
 App layout on the server:
@@ -22,15 +22,22 @@ App layout on the server:
   apps/backend/uploads/
 ```
 
+Public URLs:
+
+```text
+https://prosperax.online
+https://www.prosperax.online
+```
+
 ---
 
 ## 0. Before you start
 
 Have ready:
 
-1. VPS SSH access (root or sudo user)
-2. Domain `prosperax.org` on GoDaddy
-3. Git repo URL (GitHub/GitLab)
+1. Hostinger VPS SSH access (root, or a sudo user — Hostinger usually gives root + IP)
+2. Domain **prosperax.online** in Hostinger (Domains / DNS)
+3. Git repo URL (GitHub/GitLab) the VPS can clone
 4. Production secrets:
    - strong `JWT_SECRET`
    - Paystack **test** keys first (live keys in Phase 9)
@@ -38,37 +45,51 @@ Have ready:
    - SMTP credentials (when email goes live; console is OK initially)
 5. Admin phone numbers for `ADMIN_PHONE` / `ADMIN_PHONES`
 
-Suggested VPS size to start: **1–2 vCPU, 2 GB RAM, 40 GB disk**.
+Suggested VPS size to start: **1–2 vCPU, 2 GB RAM, 40 GB disk** (Hostinger KVM plans that match this are fine).
+
+From Hostinger hPanel note:
+
+- VPS → **Overview** → copy public IP
+- VPS → **SSH Access** → enable SSH if needed; use the provided root password or SSH key
+- Prefer Ubuntu **24.04** template when creating/rebuilding the VPS
 
 ---
 
-## 1. Point DNS (GoDaddy)
+## 1. Point DNS (Hostinger)
 
-In GoDaddy DNS for `prosperax.org`:
+In Hostinger → **Domains** → `prosperax.online` → **DNS / DNS Zone**:
 
 | Type | Name | Value | TTL |
 |---|---|---|---|
-| A | `@` | your VPS public IP | 600 (or default) |
-| A | `www` | your VPS public IP | 600 |
+| A | `@` | your VPS public IP | 300 or default |
+| A | `www` | your VPS public IP | 300 or default |
 
-Optional later: redirect `www` → apex in Nginx.
+Notes:
 
-Wait until DNS resolves:
+- If Hostinger already added parking / “Coming soon” A/CNAME records for `@` or `www`, **edit or delete** them so only your VPS IP remains.
+- You do **not** need Hostinger shared hosting for this site — DNS only on Hostinger, app on the VPS.
+- Optional later: redirect `www` → apex in Nginx after HTTPS works.
+
+Wait until DNS resolves (can take a few minutes to a few hours):
 
 ```bash
-dig +short prosperax.org
-ping prosperax.org
+dig +short prosperax.online
+dig +short www.prosperax.online
+ping prosperax.online
 ```
+
+Both lookups should return your VPS IP.
 
 ---
 
-## 2. Prepare the VPS
+## 2. Prepare the VPS (Ubuntu 24.04)
 
-SSH in:
+SSH in (Hostinger typically uses root):
 
 ```bash
 ssh root@YOUR_VPS_IP
-# or: ssh ubuntu@YOUR_VPS_IP
+# if you created a non-root user:
+# ssh YOUR_USER@YOUR_VPS_IP
 ```
 
 Update packages:
@@ -87,6 +108,8 @@ sudo ufw enable
 sudo ufw status
 ```
 
+Also confirm Hostinger’s **VPS firewall / security** (if shown in hPanel) allows **22, 80, 443**. Do not open Postgres or app ports publicly.
+
 ### Node.js 20
 
 ```bash
@@ -103,6 +126,8 @@ sudo npm install -g pm2
 ```
 
 ### Python 3 + venv
+
+Ubuntu 24 ships Python 3.12 — that is fine for Prosperax:
 
 ```bash
 sudo apt install -y python3 python3-venv python3-pip
@@ -126,7 +151,7 @@ GRANT ALL PRIVILEGES ON DATABASE prosperax TO prosperax;
 SQL
 ```
 
-On newer Postgres you may also need:
+On Ubuntu 24 / Postgres 16 you also need:
 
 ```bash
 sudo -u postgres psql -d prosperax -c "GRANT ALL ON SCHEMA public TO prosperax;"
@@ -169,13 +194,13 @@ nano .env
 
 ```env
 ENVIRONMENT=production
-CORS_ORIGINS=https://prosperax.org,https://www.prosperax.org
+CORS_ORIGINS=https://prosperax.online,https://www.prosperax.online
 DATABASE_URL=postgresql+psycopg://prosperax:CHANGE_ME_STRONG_PASSWORD@127.0.0.1:5432/prosperax
 UPLOAD_DIR=/var/www/prosperax/apps/backend/uploads
 
 ADMIN_PHONE=+2348XXXXXXXXX
 ADMIN_PHONES=
-ADMIN_EMAIL=admin@prosperax.org
+ADMIN_EMAIL=admin@prosperax.online
 
 JWT_SECRET=GENERATE_A_LONG_RANDOM_SECRET
 JWT_EXPIRE_MINUTES=10080
@@ -193,15 +218,15 @@ SMTP_USERNAME=
 SMTP_PASSWORD=
 SMTP_USE_TLS=true
 SMTP_USE_SSL=false
-MAIL_FROM=Prosperax <noreply@prosperax.org>
-MAIL_REPLY_TO=support@prosperax.org
+MAIL_FROM=Prosperax <noreply@prosperax.online>
+MAIL_REPLY_TO=support@prosperax.online
 
 # Paystack: keep mock/test first
 PAYSTACK_SECRET_KEY=sk_test_...
 PAYSTACK_PUBLIC_KEY=pk_test_...
 PAYSTACK_MOCK=false
 
-FRONTEND_URL=https://prosperax.org
+FRONTEND_URL=https://prosperax.online
 ```
 
 Generate a JWT secret:
@@ -241,7 +266,7 @@ Create `/var/www/prosperax/apps/frontend/.env.production` (or `.env.local` used 
 
 ```env
 BACKEND_URL=http://127.0.0.1:8000
-NEXT_PUBLIC_SITE_URL=https://prosperax.org
+NEXT_PUBLIC_SITE_URL=https://prosperax.online
 ```
 
 Build:
@@ -252,7 +277,7 @@ npm run build
 
 Notes:
 
-- Browser calls go to `https://prosperax.org/api/...` and `/media/...`
+- Browser calls go to `https://prosperax.online/api/...` and `/media/...`
 - Nginx can proxy those directly to the backend (recommended), **or** Next rewrites can forward to `BACKEND_URL`
 - This guide uses **Nginx for `/api` and `/media`** so Paystack webhooks hit FastAPI reliably
 
@@ -284,7 +309,7 @@ module.exports = {
       env: {
         NODE_ENV: "production",
         BACKEND_URL: "http://127.0.0.1:8000",
-        NEXT_PUBLIC_SITE_URL: "https://prosperax.org",
+        NEXT_PUBLIC_SITE_URL: "https://prosperax.online",
       },
     },
   ],
@@ -320,7 +345,7 @@ Create `/etc/nginx/sites-available/prosperax`:
 server {
     listen 80;
     listen [::]:80;
-    server_name prosperax.org www.prosperax.org;
+    server_name prosperax.online www.prosperax.online;
 
     client_max_body_size 12m;
 
@@ -367,14 +392,14 @@ sudo nginx -t
 sudo systemctl reload nginx
 ```
 
-Visit `http://prosperax.org` (HTTP first).
+Visit `http://prosperax.online` (HTTP first). DNS must already point at this VPS.
 
 ---
 
 ## 8. HTTPS with Let’s Encrypt
 
 ```bash
-sudo certbot --nginx -d prosperax.org -d www.prosperax.org
+sudo certbot --nginx -d prosperax.online -d www.prosperax.online
 ```
 
 Follow prompts (email + agree to terms). Certbot will adjust Nginx for TLS and renewals.
@@ -383,9 +408,11 @@ Confirm:
 
 ```bash
 sudo systemctl status certbot.timer
-curl -I https://prosperax.org
-curl https://prosperax.org/api/health
+curl -I https://prosperax.online
+curl https://prosperax.online/api/health
 ```
+
+If certbot fails with “connection refused / timeout”, check Hostinger firewall + UFW, and that A records hit this VPS.
 
 ---
 
@@ -434,7 +461,7 @@ In Paystack Dashboard → Settings → API Keys & Webhooks:
 **Webhook URL**
 
 ```text
-https://prosperax.org/api/webhooks/paystack
+https://prosperax.online/api/webhooks/paystack
 ```
 
 Events needed (at minimum):
@@ -451,7 +478,7 @@ Keep `PAYSTACK_MOCK=false` and use **test keys** until Phase 9 go-live.
 
 ## 11. First smoke test on production
 
-1. Open `https://prosperax.org`
+1. Open `https://prosperax.online`
 2. Log in with admin phone (`ADMIN_PHONE`) — OTP via console/Termii
 3. Open `/admin` → Overview loads
 4. Create a help request → approve in Admin → Requests
@@ -491,8 +518,8 @@ pm2 logs --lines 80
 Health checks:
 
 ```bash
-curl -fsS https://prosperax.org/api/health
-curl -I https://prosperax.org
+curl -fsS https://prosperax.online/api/health
+curl -I https://prosperax.online
 ```
 
 ---
@@ -519,16 +546,18 @@ You may need a `~/.pgpass` file so cron can authenticate non-interactively.
 15 3 * * * tar -czf /var/backups/prosperax/uploads-$(date +\%F).tar.gz -C /var/www/prosperax/apps/backend uploads
 ```
 
-Keep at least 7–14 days of backups.
+Keep at least 7–14 days of backups. Prefer copying dumps off the VPS (Hostinger object storage, another machine, or download periodically).
 
 ---
 
-## 14. GoDaddy-specific notes
+## 14. Hostinger-specific notes
 
-- **DNS only** is required from GoDaddy for this setup (A records). Hosting can stay on your VPS.
-- Use GoDaddy **email mailbox** for human support (`support@…`) if you want; app mail should still use transactional SMTP later (Brevo/SendGrid/SES), not mailbox SMTP if deliverability matters.
-- If GoDaddy offers a VPS, Ubuntu + SSH is fine — follow this same guide.
+- **Domain + VPS can both be Hostinger** — use domain DNS A records to the VPS IP; do not point the site at Hostinger shared hosting.
+- In hPanel → VPS: note the IP, OS (Ubuntu 24.04), and SSH credentials. Rebuild to Ubuntu 24.04 if you picked a different image by mistake.
+- Hostinger may show a separate **firewall** UI — allow SSH (22), HTTP (80), HTTPS (443) there as well as with `ufw`.
+- Optional Hostinger email mailbox (`support@prosperax.online`) is fine for human replies; app transactional mail should still use SMTP later (Brevo/SendGrid/SES) for better deliverability.
 - Open ports **22 / 80 / 443** only. Do **not** expose Postgres (`5432`) or app ports (`3000`/`8000`) publicly.
+- If you use Hostinger’s panel “one-click apps”, skip them for Prosperax — this guide’s Nginx + PM2 layout is the source of truth.
 
 ---
 
@@ -536,11 +565,13 @@ Keep at least 7–14 days of backups.
 
 | Symptom | Check |
 |---|---|
+| DNS still shows old IP / parking | Hostinger DNS A records for `@` and `www`; wait for TTL |
 | 502 Bad Gateway | `pm2 status`, `pm2 logs`, `sudo nginx -t` |
 | `/api/health` fails | backend `.env`, DB URL, `pm2 restart prosperax-backend` |
 | Photos 404 | `UPLOAD_DIR` path + permissions; Nginx `/media/` block |
 | OTP never arrives | `SMS_PROVIDER`, Termii key/sender; check backend logs |
 | Emails missing | `MAIL_PROVIDER`; console logs on VPS until SMTP is set |
+| Certbot fails | DNS must resolve to this VPS; Hostinger firewall + UFW allow 80/443 |
 | Paystack webhook failures | public HTTPS URL, signature secret key, Nginx `/api/` proxy |
 | Admin forbidden | phone normalized and listed in `ADMIN_PHONE(S)` |
 | After deploy old UI | hard refresh; confirm `npm run build` + frontend PM2 restart |
@@ -561,9 +592,9 @@ sudo tail -f /var/log/nginx/error.log
 
 - [ ] Strong DB password and `JWT_SECRET`
 - [ ] `.env` not committed to git
-- [ ] UFW enabled (SSH + HTTP/HTTPS only)
+- [ ] UFW (+ Hostinger firewall) enabled (SSH + HTTP/HTTPS only)
 - [ ] App binds to `127.0.0.1` (not `0.0.0.0`) behind Nginx
-- [ ] HTTPS working with auto-renew
+- [ ] HTTPS working with auto-renew for `prosperax.online` (+ `www`)
 - [ ] Paystack still on **test** keys until Phase 9
 - [ ] Admin phone(s) verified
 - [ ] Backups scheduled

@@ -1,7 +1,7 @@
 # Prosperax — Development Plan
 
 **Version:** 5.0 · 2026-08-12  
-**Domain:** prosperax.org  
+**Domain:** prosperax.online  
 **Stack:** Next.js + FastAPI + PostgreSQL · **Linux VPS · Nginx + PM2**  
 **Payments:** Paystack (private entity) · platform fee 0%  
 **Design ref:** [Rising Lion Money](https://risinglionmoney.com/) · green · hopeful mutual aid · English
@@ -149,7 +149,7 @@ Paystack keys, SMS keys, SMTP password, JWT secret, DB URL, `UPLOAD_DIR`, bootst
 | Jobs | cron (or a small PM2 cron-style script): weekly payouts, deadline refunds |
 | Email | SMTP from VPS/host panel |
 | Secrets | `.env` on server (not in git) |
-| Domain | prosperax.org → VPS A-record |
+| Domain | prosperax.online → Hostinger VPS A-record |
 
 **Deploy pattern**
 1. Install Node, Python, PostgreSQL, Nginx, PM2 on the VPS.  
@@ -159,7 +159,7 @@ Paystack keys, SMS keys, SMTP password, JWT secret, DB URL, `UPLOAD_DIR`, bootst
 5. Deploy updates: `git pull` → build → `pm2 restart prosperax-frontend prosperax-backend`.
 
 **Paystack (external — required)**  
-Checkout · Manual payouts / settle-to-balance (hold) · Transfers (weekly) · Refunds · Webhooks → `https://prosperax.org/api/...`
+Checkout · Manual payouts / settle-to-balance (hold) · Transfers (weekly) · Refunds · Webhooks → `https://prosperax.online/api/...`
 
 **SMS OTP:** use a Nigeria-capable SMS API from the backend (only external service besides Paystack/email SMTP as needed for auth).
 ---
